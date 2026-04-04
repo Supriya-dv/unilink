@@ -1,343 +1,259 @@
+import React from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { 
+  Sparkles, Users, Layers, ShieldCheck, 
+  ArrowRight, Globe, Zap, MessageSquare, 
+  Briefcase, Heart, Star
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Sparkles,
-  Users,
-  Layers,
-  ShieldCheck,
-  ArrowRight,
-  ClipboardList,
-} from "lucide-react";
 
 const features = [
   {
     icon: Sparkles,
-    title: "Polished UI, Fast Results",
-    description:
-      "Ship faster with a consistent, modern design system built for student communities and professional growth.",
+    title: "Futuristic Glass UI",
+    description: "Experience a billion-dollar startup aesthetic with our premium glassmorphism design system.",
+    color: "cyan"
   },
   {
     icon: Users,
-    title: "Meaningful Connections",
-    description:
-      "Find peers, mentors, and alumni in moments — not months. Build your network with purpose.",
+    title: "Deep Connections",
+    description: "Find your tribe through AI-powered matching and meaningful campus interactions.",
+    color: "purple"
   },
   {
-    icon: Layers,
-    title: "Organize Your Workflow",
-    description:
-      "Keep projects, conversations, and goals in one modern dashboard — designed for clarity and impact.",
+    icon: Zap,
+    title: "Instant Networking",
+    description: "Zero friction. Connect with peers, mentors, and alumni with a single swipe.",
+    color: "pink"
   },
   {
     icon: ShieldCheck,
-    title: "Privacy You Can Trust",
-    description:
-      "We respect your data. End-to-end mindset, without compromising the experience.",
+    title: "Privacy First",
+    description: "Your data is yours. We provide a safe, encrypted space for student communities.",
+    color: "cyan"
   },
 ];
 
-const Index = () => {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Navbar */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-card/70 backdrop-blur-md">
-        <div className="container flex h-16 items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-hero-gradient">
-              <span className="font-display text-xl font-bold text-primary-foreground">U</span>
-            </div>
-            <span className="font-display text-lg font-semibold tracking-tight text-foreground">UniLink</span>
-          </Link>
-          <nav className="hidden items-center gap-8 md:flex">
-            <a href="#features" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-              Features
-            </a>
-            <a href="#why" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-              Why UniLink
-            </a>
-            <a href="#footer" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-              Contact
-            </a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link to="/login">
-              <Button variant="ghost" size="sm">
-                Log in
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button variant="hero" size="sm">
-                Get Started
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="pt-20">
-        {/* Hero */}
-        <section className="relative overflow-hidden py-20 md:py-32">
-          <div className="absolute -inset-x-16 -top-24 h-[440px] w-[980px] -translate-x-1/2 transform rounded-full bg-hero-gradient opacity-30 blur-3xl" />
-          <div className="container relative">
-            <div className="mx-auto max-w-5xl">
-              <div className="grid gap-12 md:grid-cols-12 md:items-center">
-                <div className="md:col-span-7">
-                  <Badge className="mb-6 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-                    Built for students + professionals
-                  </Badge>
-                  <h1 className="font-display text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl md:text-6xl">
-                    A modern platform for building authentic <span className="text-gradient">campus communities</span>
-                  </h1>
-                  <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-                    From connecting with classmates and alumni, to tracking progress toward your next career milestone — UniLink brings it all together in a clean, professional experience.
-                  </p>
-                  <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                    <Link to="/signup">
-                      <Button size="lg" className="gap-2">
-                        Start free trial <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <Link to="/login">
-                      <Button variant="hero-outline" size="lg">
-                        Already have an account?
-                      </Button>
-                    </Link>
-                  </div>
-                  <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <div className="rounded-2xl bg-card/60 p-4 text-center backdrop-blur">
-                      <p className="text-2xl font-semibold text-foreground">10K+</p>
-                      <p className="text-sm text-muted-foreground">Active members</p>
-                    </div>
-                    <div className="rounded-2xl bg-card/60 p-4 text-center backdrop-blur">
-                      <p className="text-2xl font-semibold text-foreground">250+</p>
-                      <p className="text-sm text-muted-foreground">Universities represented</p>
-                    </div>
-                    <div className="rounded-2xl bg-card/60 p-4 text-center backdrop-blur">
-                      <p className="text-2xl font-semibold text-foreground">1,200+</p>
-                      <p className="text-sm text-muted-foreground">Mentorship connections</p>
-                    </div>
-                    <div className="rounded-2xl bg-card/60 p-4 text-center backdrop-blur">
-                      <p className="text-2xl font-semibold text-foreground">4.9</p>
-                      <p className="text-sm text-muted-foreground">Average satisfaction</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="md:col-span-5">
-                  <div className="relative overflow-hidden rounded-3xl border border-border bg-card/80 p-6 shadow-xl backdrop-blur">
-                    <div className="absolute inset-x-0 -top-10 h-32 bg-gradient-to-b from-primary/30 to-transparent blur-2xl" />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-primary">Today at 11:00 AM</p>
-                        <p className="text-lg font-semibold text-foreground">Weekly community meetup</p>
-                      </div>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                        Live
-                      </span>
-                    </div>
-                    <div className="mt-6 flex items-center gap-3">
-                      <div className="flex -space-x-3">
-                        {Array.from({ length: 5 }).map((_, idx) => (
-                          <div
-                            key={idx}
-                            className="h-10 w-10 rounded-full border border-card bg-muted"
-                          />
-                        ))}
-                      </div>
-                      <p className="text-sm text-muted-foreground">+ 12 more joining</p>
-                    </div>
-                    <div className="mt-6 flex gap-3">
-                      <Button size="sm" className="flex-1">
-                        Join now
-                      </Button>
-                      <Button variant="ghost" size="sm" className="flex-1">
-                        View agenda
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Features */}
-        <section id="features" className="border-t border-border bg-card py-20">
-          <div className="container">
-            <div className="mx-auto mb-12 max-w-2xl text-center">
-              <h2 className="font-display text-3xl font-bold md:text-4xl">
-                Everything you need to <span className="text-gradient">build a thriving community</span>
-              </h2>
-              <p className="mt-4 text-muted-foreground">
-                A modern experience for students, educators, and professionals — designed for clarity, speed, and impact.
-              </p>
-            </div>
-
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {features.map((feature, i) => (
-                <div
-                  key={feature.title}
-                  className="group rounded-2xl border border-border bg-background p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
-                >
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                    <feature.icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="mb-2 font-display text-lg font-semibold">{feature.title}</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Why section */}
-        <section id="why" className="py-20">
-          <div className="container">
-            <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
-              <div className="lg:col-span-5">
-                <h2 className="font-display text-3xl font-bold md:text-4xl">
-                  Built to feel <span className="text-gradient">purposeful and professional</span>
-                </h2>
-                <p className="mt-6 max-w-xl text-muted-foreground">
-                  UniLink combines familiar collaboration patterns with a clean UI, so every interaction feels intentional and focused. Spend less time navigating and more time creating value.
-                </p>
-                <div className="mt-8 space-y-4">
-                  <div className="flex items-start gap-3">
-                    <ShieldCheck className="mt-1 h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-semibold text-foreground">Security-first mindset</p>
-                      <p className="text-sm text-muted-foreground">Secure by default with thoughtful privacy controls and permissions.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <ClipboardList className="mt-1 h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-semibold text-foreground">Clear structure</p>
-                      <p className="text-sm text-muted-foreground">Everything is organized so you can focus on progress instead of navigation.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="lg:col-span-7">
-                <div className="rounded-3xl border border-border bg-card p-10 shadow-lg">
-                  <h3 className="font-display text-xl font-semibold">Latest activity</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">Stay in the loop with real-time updates tailored to your network.</p>
-
-                  <div className="mt-8">
-                    <ScrollArea className="h-[340px] rounded-2xl border border-border bg-background p-4">
-                      <div className="space-y-4">
-                        {Array.from({ length: 6 }).map((_, idx) => (
-                          <div key={idx} className="flex items-start gap-4 rounded-xl border border-border bg-card p-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                              <Sparkles className="h-5 w-5" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-foreground">New connection suggestion</p>
-                              <p className="text-sm text-muted-foreground">
-                                See how {idx % 2 === 0 ? "Sarah" : "Jordan"} is applying for internships at top firms.
-                              </p>
-                              <p className="mt-2 text-xs text-muted-foreground">2h ago</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer id="footer" className="border-t border-border bg-card py-12">
-          <div className="container">
-            <div className="grid gap-10 md:grid-cols-2">
-              <div>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-hero-gradient">
-                    <span className="font-display text-lg font-bold text-primary-foreground">U</span>
-                  </div>
-                  <span className="font-display text-lg font-semibold">UniLink</span>
-                </div>
-                <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground">
-                  A modern platform for students and professionals who want more than a message board—built for connection, collaboration, and long-term growth.
-                </p>
-              </div>
-              <div className="grid gap-6 sm:grid-cols-3">
-                <div>
-                  <h4 className="text-sm font-semibold text-foreground">Product</h4>
-                  <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                    <li>
-                      <a href="#features" className="transition-colors hover:text-foreground">
-                        Features
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#why" className="transition-colors hover:text-foreground">
-                        Why UniLink
-                      </a>
-                    </li>
-                    <li>
-                      <Link to="/login" className="transition-colors hover:text-foreground">
-                        Sign in
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-sm font-semibold text-foreground">Company</h4>
-                  <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                    <li>
-                      <a href="#" className="transition-colors hover:text-foreground">
-                        About
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="transition-colors hover:text-foreground">
-                        Careers
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="transition-colors hover:text-foreground">
-                        Privacy
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-sm font-semibold text-foreground">Connect</h4>
-                  <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                    <li>
-                      <a href="#" className="transition-colors hover:text-foreground">
-                        Help Center
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="transition-colors hover:text-foreground">
-                        Feedback
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="transition-colors hover:text-foreground">
-                        Contact
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div className="mt-10 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-              © {new Date().getFullYear()} UniLink. All rights reserved.
-            </div>
-          </div>
-        </footer>
-      </main>
-    </div>
-  );
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.3
+    }
+  }
 };
 
-export default Index;
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { type: "spring" as const, stiffness: 100 }
+  }
+};
+
+export default function Index() {
+  return (
+    <div className="min-h-screen bg-premium-900 text-white overflow-x-hidden selection:bg-cyan/30 selection:text-cyan">
+      
+      {/* 🔮 Background Effects */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan/10 rounded-full blur-[120px] animate-blob-float" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple/10 rounded-full blur-[120px] animate-blob-float [animation-delay:2s]" />
+      </div>
+
+      {/* 🛰️ Navigation */}
+      <nav className="fixed top-0 inset-x-0 z-50 h-20 glass border-b border-white/5 px-6 md:px-12 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2 group">
+          <motion.div 
+            whileHover={{ rotate: 180 }}
+            className="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan via-purple to-pink flex items-center justify-center p-0.5"
+          >
+            <div className="h-full w-full rounded-[10px] bg-premium-900 flex items-center justify-center font-bold text-xl text-white">U</div>
+          </motion.div>
+          <span className="text-2xl font-bold tracking-tighter text-white group-hover:text-cyan transition-colors">UniLink</span>
+        </Link>
+        
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-white/60">
+          <a href="#features" className="hover:text-white transition-colors">Features</a>
+          <a href="#about" className="hover:text-white transition-colors">Network</a>
+          <a href="#community" className="hover:text-white transition-colors">Join Us</a>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <Link to="/login" className="text-sm font-semibold text-white/70 hover:text-white transition-colors hidden sm:block">Log in</Link>
+          <Link to="/signup">
+            <Button className="rounded-xl bg-white text-premium-900 font-bold px-6 h-11 hover:bg-cyan hover:shadow-cyan-glow transition-all">
+              Sign Up
+            </Button>
+          </Link>
+        </div>
+      </nav>
+
+      {/* 🚀 Hero Section */}
+      <section className="pt-40 pb-20 px-6 container max-w-7xl mx-auto relative">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+          >
+            <Badge className="bg-white/5 border-white/10 text-cyan-400 mb-6 py-2 px-4 rounded-full text-xs font-semibold uppercase tracking-widest backdrop-blur-md">
+               ✨ The Future of Campus Networking
+            </Badge>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8">
+              CONNECT <br /> 
+              <span className="text-gradient-cyan-purple-pink">BEYOND</span> <br />
+              BOUNDARIES
+            </h1>
+            <p className="text-xl text-white/60 mb-10 max-w-xl leading-relaxed">
+              UniLink is a premium ecosystem for ambitious students and alumni. 
+              Find your next co-founder, mentor, or friend in a space built for excellence.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link to="/signup">
+                <Button className="h-14 px-10 rounded-2xl bg-cyan-purple text-white font-black text-lg shadow-cyan transition-all hover:scale-105 active:scale-95 group">
+                  Get Started Now <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Button variant="ghost" className="h-14 px-10 rounded-2xl border border-white/10 text-white font-bold hover:bg-white/5">
+                Watch Demo
+              </Button>
+            </div>
+            
+            <div className="mt-12 flex items-center gap-6">
+              <div className="flex -space-x-4">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="h-12 w-12 rounded-full border-2 border-premium-900 bg-white/10" />
+                ))}
+              </div>
+              <p className="text-sm text-white/40">
+                Joined by <span className="text-white font-bold">10,000+</span> curious minds
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ x: 50, opacity: 0, scale: 0.8 }}
+            animate={{ x: 0, opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className="relative"
+          >
+             <div className="relative z-10 glass-card rounded-[3rem] p-4 aspect-square max-w-[500px] mx-auto overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-tr from-cyan/20 to-pink/20 opacity-50 group-hover:scale-110 transition-transform duration-700" />
+                <img 
+                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=800&fit=crop" 
+                  className="w-full h-full object-cover rounded-[2.5rem] mix-blend-overlay grayscale group-hover:grayscale-0 transition-all duration-700" 
+                  alt="App Preview"
+                />
+                
+                {/* Floating Elements on Top */}
+                <motion.div 
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  className="absolute top-10 right-10 glass-dark border-white/10 p-4 rounded-2xl shadow-2xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-cyan/20 flex items-center justify-center text-cyan"><Heart className="h-5 w-5 fill-cyan" /></div>
+                    <div>
+                      <p className="text-xs font-bold text-white">New Match!</p>
+                      <p className="text-[10px] text-white/50">Sophia liked you back</p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div 
+                  animate={{ y: [0, 10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+                  className="absolute bottom-10 left-10 glass-dark border-white/10 p-4 rounded-2xl shadow-2xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-purple/20 flex items-center justify-center text-purple"><Star className="h-5 w-5 fill-purple" /></div>
+                    <div>
+                      <p className="text-xs font-bold text-white">Premium Rank</p>
+                      <p className="text-[10px] text-white/50">Top 1% Profile</p>
+                    </div>
+                  </div>
+                </motion.div>
+             </div>
+             
+             {/* Glowing Orbs behind the card */}
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-cyan/5 blur-[100px] -z-10 rounded-full" />
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-purple/10 blur-[80px] -z-20 rounded-full animate-pulse-glow" />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 🔮 Features Grid */}
+      <section id="features" className="py-32 px-6">
+        <div className="container max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-6xl font-black mb-4">ENGINEERED FOR <span className="text-cyan">IMPACT</span></h2>
+            <p className="text-white/50 max-w-2xl mx-auto">Everything you need to navigate campus life and beyond.</p>
+          </div>
+
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {features.map((feature, i) => (
+              <motion.div 
+                key={i}
+                variants={itemVariants}
+                className="glass-card p-8 rounded-[2.5rem] border-white/5 hover:border-white/20 transition-all group"
+              >
+                <div className={`h-16 w-16 rounded-2xl bg-${feature.color}/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all`}>
+                  <feature.icon className={`h-8 w-8 text-${feature.color}`} />
+                </div>
+                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                <p className="text-sm text-white/50 leading-relaxed">{feature.description}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 🚀 CTA Section */}
+      <section className="py-20 px-6 overflow-hidden">
+        <div className="container max-w-5xl mx-auto">
+           <div className="relative glass-card rounded-[3.5rem] p-12 md:p-24 text-center overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-tr from-cyan/20 via-premium-900 to-pink/20 -z-10 animate-blob-float" />
+              <h2 className="text-5xl md:text-7xl font-black mb-8">READY TO <br /> REDEFINE YOUR <br /> CAMPUS LIFE?</h2>
+              <p className="text-xl text-white/60 mb-12 max-w-xl mx-auto">Join the elite network of students and graduates making real moves.</p>
+              <Link to="/signup">
+                <Button className="h-16 px-16 rounded-3xl bg-white text-premium-900 font-black text-xl shadow-white/20 transition-all hover:scale-110 active:scale-95">
+                  JOIN UNILINK
+                </Button>
+              </Link>
+           </div>
+        </div>
+      </section>
+
+      {/* 🛰️ Footer */}
+      <footer className="py-12 border-t border-white/5 px-6">
+        <div className="container max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center font-bold">U</div>
+            <span className="font-bold tracking-tight">UniLink</span>
+          </div>
+          <p className="text-sm text-white/30 truncate mx-auto md:mx-0">
+            Design & Build by <span className="text-cyan font-semibold">UniLink Labs</span> • © {new Date().getFullYear()}
+          </p>
+          <div className="flex items-center gap-6">
+            <a href="#" className="text-white/40 hover:text-white transition-colors text-xs font-semibold uppercase tracking-widest">Privacy</a>
+            <a href="#" className="text-white/40 hover:text-white transition-colors text-xs font-semibold uppercase tracking-widest">Terms</a>
+            <a href="#" className="text-white/40 hover:text-white transition-colors text-xs font-semibold uppercase tracking-widest">Twitter</a>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  );
+}

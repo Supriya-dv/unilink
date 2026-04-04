@@ -1,6 +1,11 @@
-﻿import React, { useState } from "react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { Heart, X, MapPin, Briefcase, School, Sparkles } from "lucide-react";
+import React, { useState, useEffect, memo } from "react";
+import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
+import { 
+  Heart, X, MapPin, Briefcase, School, 
+  Sparkles, Zap, Info, ShieldCheck 
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 type UserCard = {
   id: number;
@@ -13,6 +18,7 @@ type UserCard = {
   bio: string;
   image: string;
   interests: string[];
+  matchScore: number;
 };
 
 const initialUsers: UserCard[] = [
@@ -24,9 +30,10 @@ const initialUsers: UserCard[] = [
     distance: "2 miles",
     occupation: "Product Designer",
     education: "NYU",
-    bio: "Creating beautiful things • Coffee addict",
+    bio: "Creating beautiful things • Coffee addict • Always exploring new art galleries.",
     image: "https://images.unsplash.com/photo-1494790108777-766fd36f7b41?w=600&h=800&fit=crop",
-    interests: ["Design", "Travel"]
+    interests: ["Design", "Travel", "Art"],
+    matchScore: 98,
   },
   {
     id: 2,
@@ -36,9 +43,10 @@ const initialUsers: UserCard[] = [
     distance: "1.5 miles",
     occupation: "Software Engineer",
     education: "Columbia",
-    bio: "Building cool stuff • Guitar player",
+    bio: "Building cool stuff • Guitar player • Looking for someone to join my jam sessions.",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&h=800&fit=crop",
-    interests: ["Coding", "Music"]
+    interests: ["Coding", "Music", "Tech"],
+    matchScore: 85,
   },
   {
     id: 3,
@@ -48,492 +56,246 @@ const initialUsers: UserCard[] = [
     distance: "3 miles",
     occupation: "Marketing Intern",
     education: "Parsons",
-    bio: "Art enthusiast • Plant mom",
+    bio: "Art enthusiast • Plant mom • Let's go for a walk in the park!",
     image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=800&fit=crop",
-    interests: ["Art", "Fashion"]
+    interests: ["Art", "Fashion", "Nature"],
+    matchScore: 92,
+  },
+  {
+    id: 4,
+    name: "Leo",
+    age: 25,
+    location: "Manhattan",
+    distance: "4 miles",
+    occupation: "Content Creator",
+    education: "NYU",
+    bio: "Storyteller & Visionary. Exploring the intersection of tech and humanity.",
+    image: "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&h=800&fit=crop",
+    interests: ["Photography", "Philosophy", "Tech"],
+    matchScore: 78,
   }
 ];
 
-export default function UserCards() {
-  const [users, setUsers] = useState<UserCard[]>(initialUsers);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
-  const [exitX, setExitX] = useState(0);
+// ⭐ DiscoveryCard Sub-component
+// Memoized to prevent re-renders when parent state changes but props don't
+const DiscoveryCard = memo(({ user, isTop, onSwipe }: { user: UserCard, isTop: boolean, onSwipe?: () => void }) => {
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-200, 200], [-25, 25]);
+  const opacity = useTransform(x, [-200, -150, 0, 150, 200], [0, 1, 1, 1, 0]);
+  const yesOpacity = useTransform(x, [50, 150], [0, 1]);
+  const noOpacity = useTransform(x, [-50, -150], [0, 1]);
 
-  const handleSwipe = (direction: 'left' | 'right') => {
-    setDirection(direction === 'right' ? 1 : -1);
-    setExitX(direction === 'right' ? 300 : -300);
-    
-    setTimeout(() => {
-      if (currentIndex < users.length - 1) {
-        setCurrentIndex(prev => prev + 1);
-      } else {
-        setCurrentIndex(0);
-      }
-      setDirection(0);
-      setExitX(0);
-    }, 200);
-  };
-
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (info.offset.x > 80) {
-      handleSwipe('right');
-    } else if (info.offset.x < -80) {
-      handleSwipe('left');
+  const handleDragEnd = (_: any, info: PanInfo) => {
+    if (info.offset.x > 100) {
+      onSwipe?.();
+    } else if (info.offset.x < -100) {
+      onSwipe?.();
+    } else {
+      x.set(0);
     }
   };
 
-  const currentUser = users[currentIndex];
-
-  if (!currentUser) return null;
-
   return (
-    <motion.div 
-      style={container}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+    <motion.div
+      style={isTop ? { x, rotate, opacity } : { scale: 0.95, opacity: 0.5, y: 15 }}
+      drag={isTop ? "x" : false}
+      dragConstraints={{ left: 0, right: 0 }}
+      onDragEnd={handleDragEnd}
+      initial={isTop ? { scale: 0.9, opacity: 0 } : false}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      exit={{ x: x.get() > 0 ? 1000 : -1000, opacity: 0, transition: { duration: 0.3 } }}
+      className={`absolute inset-0 z-10 touch-none will-change-transform ${isTop ? "cursor-grab active:cursor-grabbing" : ""}`}
     >
-      {/* Header with Animation */}
-      <motion.div 
-        style={header}
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-      >
-        <motion.h1 
-          style={headerTitle}
-          whileHover={{ scale: 1.05 }}
-        >
-          discover
-          <motion.div
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Sparkles style={headerIcon} size={16} />
+      {/* 🔴 Swipe Indicators (only for top card) */}
+      {isTop && (
+        <>
+          <motion.div style={{ opacity: yesOpacity }} className="absolute top-10 left-10 z-20 border-4 border-cyan rounded-xl px-4 py-2 rotate-[-15deg] pointer-events-none">
+            <span className="text-3xl font-bold text-cyan uppercase tracking-widest">Like</span>
           </motion.div>
-        </motion.h1>
-      </motion.div>
-
-      {/* Card Container */}
-      <div style={cardContainer}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentUser.id}
-            initial={{ 
-              opacity: 0, 
-              scale: 0.8, 
-              y: 50,
-              rotate: direction === 1 ? 10 : -10 
-            }}
-            animate={{ 
-              opacity: 1, 
-              scale: 1, 
-              y: 0,
-              rotate: 0,
-              transition: { 
-                type: "spring", 
-                stiffness: 300, 
-                damping: 25 
-              }
-            }}
-            exit={{ 
-              opacity: 0, 
-              x: exitX,
-              rotate: direction === 1 ? 10 : -10,
-              scale: 0.8,
-              transition: { duration: 0.2 }
-            }}
-            style={cardWrapper}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.7}
-            onDragEnd={handleDragEnd}
-            whileDrag={{ scale: 1.05, cursor: "grabbing" }}
-            whileTap={{ cursor: "grabbing" }}
-          >
-            {/* Card Image with Parallax Effect */}
-            <motion.div 
-              style={cardImageContainer}
-              animate={{ scale: 1 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.3 }}
-            >
-              <img 
-                src={currentUser.image} 
-                alt={currentUser.name}
-                style={cardImage}
-              />
-              <motion.div 
-                style={imageGradient}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-              />
-            </motion.div>
-
-            {/* Card Content with Staggered Animation */}
-            <motion.div 
-              style={cardContent}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            >
-              {/* Name and Age */}
-              <motion.div 
-                style={nameSection}
-                initial={{ x: -10, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.25 }}
-              >
-                <motion.h2 
-                  style={userName}
-                  whileHover={{ scale: 1.05, originX: 0 }}
-                >
-                  {currentUser.name}
-                </motion.h2>
-                <span style={userAge}>{currentUser.age}</span>
-              </motion.div>
-
-              {/* Location */}
-              <motion.div 
-                style={infoRow}
-                initial={{ x: -10, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                <MapPin style={infoIcon} size={12} />
-                <span style={infoText}>{currentUser.location}</span>
-                <span style={infoDot}>•</span>
-                <span style={infoText}>{currentUser.distance}</span>
-              </motion.div>
-
-              {/* Bio */}
-              <motion.p 
-                style={bio}
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.35 }}
-              >
-                {currentUser.bio}
-              </motion.p>
-
-              {/* Quick Info Tags */}
-              <motion.div 
-                style={tagsContainer}
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                <motion.span 
-                  style={tag}
-                  whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.3)" }}
-                >
-                  <Briefcase size={10} style={{ marginRight: '4px' }} />
-                  {currentUser.occupation.split(' ')[0]}
-                </motion.span>
-                <motion.span 
-                  style={tag}
-                  whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.3)" }}
-                >
-                  <School size={10} style={{ marginRight: '4px' }} />
-                  {currentUser.education}
-                </motion.span>
-              </motion.div>
-            </motion.div>
-
-            {/* Swipe Indicators */}
-            <motion.div 
-              style={swipeIndicatorLeft}
-              animate={{ 
-                opacity: exitX < 0 ? 1 : 0,
-                scale: exitX < 0 ? 1.2 : 1
-              }}
-            >
-              <X size={20} />
-            </motion.div>
-            
-            <motion.div 
-              style={swipeIndicatorRight}
-              animate={{ 
-                opacity: exitX > 0 ? 1 : 0,
-                scale: exitX > 0 ? 1.2 : 1
-              }}
-            >
-              <Heart size={20} />
-            </motion.div>
+          <motion.div style={{ opacity: noOpacity }} className="absolute top-10 right-10 z-20 border-4 border-pink rounded-xl px-4 py-2 rotate-[15deg] pointer-events-none">
+            <span className="text-3xl font-bold text-pink uppercase tracking-widest">Nope</span>
           </motion.div>
-        </AnimatePresence>
-      </div>
+        </>
+      )}
 
-      {/* Action Buttons with Hover Animations */}
-      <motion.div 
-        style={actionsContainer}
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        <motion.button
-          style={{ ...actionButton, ...actionButtonNope }}
-          whileHover={{ 
-            scale: 1.1,
-            boxShadow: "0 10px 20px -5px rgba(239, 68, 68, 0.3)"
-          }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => handleSwipe('left')}
-        >
-          <X size={20} />
-        </motion.button>
+      {/* 🔮 Card Frame */}
+      <div className="w-full h-full rounded-[2.5rem] overflow-hidden glass-card relative group shadow-2xl">
         
-        <motion.button
-          style={{ ...actionButton, ...actionButtonLike }}
-          whileHover={{ 
-            scale: 1.1,
-            boxShadow: "0 10px 20px -5px rgba(16, 185, 129, 0.3)"
-          }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => handleSwipe('right')}
-        >
-          <Heart size={20} />
-        </motion.button>
-      </motion.div>
+        {/* 🔥 GPU Optimized Image Container */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={user.image} 
+            alt={user.name}
+            style={{ transform: "translateZ(0)" }}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+        </div>
+        
+        {/* Overlays */}
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-premium-900 via-premium-900/60 to-transparent p-8 flex flex-col justify-end z-10">
+          
+          {/* User Info Header */}
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <h2 className="text-4xl font-bold text-white flex items-center gap-2">
+                {user.name}, {user.age}
+                <ShieldCheck className="h-6 w-6 text-cyan" />
+              </h2>
+              <div className="flex items-center gap-2 text-muted-foreground mt-1">
+                <MapPin className="h-4 w-4" />
+                <span className="text-sm">{user.location} • {user.distance}</span>
+              </div>
+            </div>
+            
+            {/* Match Percentage SVG */}
+            <div className="flex flex-col items-center">
+              <div className="h-16 w-16 rounded-full border-2 border-cyan/30 flex items-center justify-center p-1 relative">
+                 <svg className="absolute inset-0 w-full h-full -rotate-90">
+                   <circle cx="32" cy="32" r="28" fill="transparent" stroke="currentColor" strokeWidth="4" className="text-white/10" />
+                   <motion.circle 
+                     cx="32" cy="32" r="28" fill="transparent" stroke="currentColor" strokeWidth="4"
+                     strokeDasharray={176} initial={{ strokeDashoffset: 176 }}
+                     animate={{ strokeDashoffset: 176 - (176 * user.matchScore) / 100 }}
+                     transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
+                     className="text-cyan drop-shadow-[0_0_8px_rgba(0,245,255,0.5)]"
+                   />
+                 </svg>
+                 <span className="text-xs font-bold text-cyan">{user.matchScore}%</span>
+              </div>
+              <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tighter">Match</span>
+            </div>
+          </div>
 
-      {/* Counter with Animation */}
-      <motion.p 
-        style={counter}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        key={currentIndex}
-      >
-        <motion.span
-          key={currentIndex}
-          initial={{ scale: 1.5, color: "#6366f1" }}
-          animate={{ scale: 1, color: "#6b7280" }}
-          transition={{ type: "spring", stiffness: 400 }}
-        >
-          {currentIndex + 1}
-        </motion.span> / {users.length}
-      </motion.p>
+          <p className="text-white/80 text-sm line-clamp-2 mb-4 leading-relaxed font-medium">
+            {user.bio}
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline" className="bg-white/5 border-white/10 rounded-xl px-3 py-1 text-xs text-white flex gap-1.5 items-center">
+              <Briefcase className="h-3 w-3" /> {user.occupation}
+            </Badge>
+            <Badge variant="outline" className="bg-white/5 border-white/10 rounded-xl px-3 py-1 text-xs text-white flex gap-1.5 items-center">
+              <School className="h-3 w-3" /> {user.education}
+            </Badge>
+            {user.interests.map(interest => (
+              <Badge key={interest} variant="outline" className="bg-cyan/10 border-cyan/20 rounded-xl px-3 py-1 text-xs text-cyan">
+                #{interest}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        <div className="absolute top-4 right-4 z-20">
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white">
+            <Info className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
     </motion.div>
   );
+});
+
+DiscoveryCard.displayName = "DiscoveryCard";
+
+export default function Discovery() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // ✅ Image Preloading Engine
+  useEffect(() => {
+    const preload = (idx: number) => {
+      if (initialUsers[idx]) {
+        const img = new Image();
+        img.src = initialUsers[idx].image;
+      }
+    };
+    preload(currentIndex + 1);
+    preload(currentIndex + 2);
+  }, [currentIndex]);
+
+  const handleSwipe = () => {
+    setCurrentIndex(prev => prev + 1);
+  };
+
+  const usersLeft = initialUsers.length - currentIndex;
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 md:p-8 relative overflow-visible">
+      
+      {/* ✨ Discovery Header */}
+      <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center mb-8 relative z-30">
+        <h1 className="text-3xl font-bold text-white flex items-center justify-center gap-2">
+          Discover <Sparkles className="h-6 w-6 text-cyan animate-pulse" />
+        </h1>
+        <p className="text-muted-foreground mt-1">Finding your perfect college connection</p>
+      </motion.div>
+
+      <div className="relative w-full max-w-[400px] aspect-[3/4.5] perspective-1000 z-10">
+        {usersLeft > 0 ? (
+          <AnimatePresence>
+            {/* We render the current card AND the next card behind it */}
+            {initialUsers[currentIndex + 1] && (
+              <DiscoveryCard 
+                key={initialUsers[currentIndex + 1].id} 
+                user={initialUsers[currentIndex + 1]} 
+                isTop={false} 
+              />
+            )}
+            {initialUsers[currentIndex] && (
+              <DiscoveryCard 
+                key={initialUsers[currentIndex].id} 
+                user={initialUsers[currentIndex]} 
+                isTop={true} 
+                onSwipe={handleSwipe}
+              />
+            )}
+          </AnimatePresence>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full glass-card rounded-[2.5rem] text-center p-8">
+            <div className="h-24 w-24 rounded-full bg-gradient-to-tr from-cyan via-purple to-pink p-1 animate-spin-slow mb-6">
+              <div className="h-full w-full rounded-full bg-premium-900 flex items-center justify-center">
+                <Sparkles className="h-10 w-10 text-white" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">That's everyone!</h2>
+            <p className="text-muted-foreground mb-6">Check back soon for more campus connections.</p>
+            <Button onClick={() => setCurrentIndex(0)} className="rounded-xl bg-cyan-purple px-8">Refresh Discovery</Button>
+          </div>
+        )}
+      </div>
+
+      {/* 🚀 Actions Bar */}
+      {usersLeft > 0 && (
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="flex items-center gap-6 mt-12 relative z-30">
+          <motion.button
+            whileHover={{ scale: 1.1, rotate: -5 }} whileTap={{ scale: 0.9 }}
+            onClick={handleSwipe}
+            className="h-20 w-20 rounded-full glass-dark border border-pink/30 flex items-center justify-center text-pink shadow-pink transition-all bg-premium-800"
+          >
+            <X className="h-10 w-10" />
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.2, y: -5 }} whileTap={{ scale: 0.9 }}
+            className="h-16 w-16 rounded-full glass-dark border border-purple/30 flex items-center justify-center text-purple shadow-purple transition-all bg-premium-800"
+          >
+            <Zap className="h-8 w-8" />
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}
+            onClick={handleSwipe}
+            className="h-20 w-20 rounded-full glass-dark border border-cyan/30 flex items-center justify-center text-cyan shadow-cyan transition-all bg-premium-800"
+          >
+            <Heart className="h-10 w-10 fill-cyan" />
+          </motion.button>
+        </motion.div>
+      )}
+
+      {/* 🔢 User Count */}
+      <p className="mt-8 text-sm text-muted-foreground font-medium relative z-30">
+        Discovering connections around <span className="text-white">New York</span>
+      </p>
+
+    </div>
+  );
 }
-
-// Styles
-const container = {
-  minHeight: "100vh",
-  display: "flex",
-  flexDirection: "column" as const,
-  alignItems: "center",
-  justifyContent: "center",
-  background: "linear-gradient(145deg, #f5f0ff 0%, #f0e7ff 100%)",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  padding: "16px",
-};
-
-const header = {
-  marginBottom: "20px",
-  textAlign: "center" as const,
-};
-
-const headerTitle = {
-  fontSize: "24px",
-  fontWeight: 500,
-  color: "#1e1b4b",
-  margin: 0,
-  display: "flex",
-  alignItems: "center",
-  gap: "6px",
-  letterSpacing: "-0.5px",
-};
-
-const headerIcon = {
-  color: "#8b5cf6",
-};
-
-const cardContainer = {
-  width: "280px",
-  height: "360px",
-  position: "relative" as const,
-  marginBottom: "16px",
-};
-
-const cardWrapper = {
-  width: "100%",
-  height: "100%",
-  borderRadius: "24px",
-  overflow: "hidden",
-  position: "relative" as const,
-  cursor: "grab",
-  boxShadow: "0 15px 30px -10px rgba(0, 0, 0, 0.2)",
-};
-
-const cardImageContainer = {
-  width: "100%",
-  height: "100%",
-  position: "relative" as const,
-};
-
-const cardImage = {
-  width: "100%",
-  height: "100%",
-  objectFit: "cover" as const,
-};
-
-const imageGradient = {
-  position: "absolute" as const,
-  bottom: 0,
-  left: 0,
-  right: 0,
-  height: "60%",
-  background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)",
-};
-
-const cardContent = {
-  position: "absolute" as const,
-  bottom: 0,
-  left: 0,
-  right: 0,
-  padding: "20px 16px",
-  color: "white",
-  zIndex: 2,
-};
-
-const nameSection = {
-  display: "flex",
-  alignItems: "baseline",
-  gap: "6px",
-  marginBottom: "4px",
-};
-
-const userName = {
-  fontSize: "22px",
-  fontWeight: 600,
-  margin: 0,
-  lineHeight: 1,
-};
-
-const userAge = {
-  fontSize: "18px",
-  fontWeight: 400,
-  opacity: 0.9,
-};
-
-const infoRow = {
-  display: "flex",
-  alignItems: "center",
-  gap: "4px",
-  marginBottom: "8px",
-  fontSize: "11px",
-};
-
-const infoIcon = {
-  opacity: 0.8,
-};
-
-const infoText = {
-  opacity: 0.9,
-  fontSize: "11px",
-};
-
-const infoDot = {
-  opacity: 0.5,
-  fontSize: "11px",
-};
-
-const bio = {
-  fontSize: "12px",
-  lineHeight: 1.4,
-  marginBottom: "10px",
-  opacity: 0.9,
-  maxWidth: "90%",
-};
-
-const tagsContainer = {
-  display: "flex",
-  gap: "6px",
-  flexWrap: "wrap" as const,
-};
-
-const tag = {
-  fontSize: "10px",
-  backgroundColor: "rgba(255,255,255,0.2)",
-  padding: "4px 8px",
-  borderRadius: "30px",
-  backdropFilter: "blur(5px)",
-  border: "1px solid rgba(255,255,255,0.2)",
-  display: "inline-flex",
-  alignItems: "center",
-};
-
-const swipeIndicatorLeft = {
-  position: "absolute" as const,
-  top: "50%",
-  left: "20px",
-  transform: "translateY(-50%)",
-  backgroundColor: "white",
-  color: "#ef4444",
-  width: "40px",
-  height: "40px",
-  borderRadius: "50%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-  zIndex: 10,
-};
-
-const swipeIndicatorRight = {
-  position: "absolute" as const,
-  top: "50%",
-  right: "20px",
-  transform: "translateY(-50%)",
-  backgroundColor: "white",
-  color: "#10b981",
-  width: "40px",
-  height: "40px",
-  borderRadius: "50%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-  zIndex: 10,
-};
-
-const actionsContainer = {
-  display: "flex",
-  gap: "12px",
-  marginBottom: "12px",
-};
-
-const actionButton = {
-  width: "48px",
-  height: "48px",
-  borderRadius: "50%",
-  border: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
-  boxShadow: "0 6px 12px -3px rgba(0,0,0,0.15)",
-  transition: "all 0.2s",
-};
-
-const actionButtonNope = {
-  backgroundColor: "white",
-  color: "#ef4444",
-  border: "2px solid #fee2e2",
-};
-
-const actionButtonLike = {
-  backgroundColor: "white",
-  color: "#10b981",
-  border: "2px solid #d1fae5",
-};
-
-const counter = {
-  fontSize: "12px",
-  color: "#6b7280",
-  margin: "4px 0 0",
-  fontWeight: 500,
-};

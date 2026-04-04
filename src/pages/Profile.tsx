@@ -1,109 +1,253 @@
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  User, Mail, MapPin, Briefcase, School, 
+  Edit3, Github, Linkedin, Twitter, ExternalLink,
+  ChevronRight, Camera, X, Check, Plus, Sparkles, ShieldCheck
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Edit, MapPin, Building, Briefcase, GraduationCap } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
-const skills = ["React", "TypeScript", "Machine Learning", "Python", "System Design", "Public Speaking"];
+const skills = ["React", "TypeScript", "UI Design", "Product Management", "Node.js", "Python"];
 
-const Profile = () => {
+export default function Profile() {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  
   return (
-    <div className="container max-w-4xl py-8">
-      {/* Cover & Avatar */}
-      <Card className="overflow-hidden shadow-card">
-        <div className="h-32 bg-hero-gradient md:h-44" />
-        <CardContent className="relative px-6 pb-6">
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-end">
-            <div className="-mt-12 flex h-24 w-24 items-center justify-center rounded-full border-4 border-card bg-primary/10 font-display text-3xl font-bold text-primary">
-              JS
-            </div>
-            <div className="flex-1">
-              <h1 className="font-display text-2xl font-bold">John Smith</h1>
-              <p className="text-sm text-muted-foreground">Computer Science · Class of 2024</p>
-              <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> Mumbai, India</span>
-                <span className="flex items-center gap-1"><Building className="h-3 w-3" /> IIT Bombay</span>
+    <div className="min-h-screen pb-20">
+      
+      {/* 🌆 Cover Image Section */}
+      <div className="relative h-64 md:h-80 w-full overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan/20 via-purple/20 to-pink/20 animate-pulse-glow" />
+        <img 
+          src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=1200&h=400&fit=crop" 
+          className="w-full h-full object-cover opacity-60"
+          alt="Cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-premium-900 to-transparent" />
+        
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="absolute bottom-6 right-6 md:right-12 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-white/20"
+        >
+          <Camera className="h-4 w-4 mr-2" /> Change Cover
+        </Button>
+      </div>
+
+      <div className="container max-w-5xl mx-auto px-4 -mt-20 relative z-10">
+        <div className="flex flex-col md:flex-row gap-8 items-start">
+          
+          {/* 👤 Avatar & Basic Info */}
+          <div className="w-full md:w-1/3 space-y-6">
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative inline-block mx-auto md:mx-0"
+            >
+              <div className="h-40 w-40 rounded-[2.5rem] p-1.5 bg-gradient-to-tr from-cyan via-purple to-pink shadow-cyan-glow animate-spin-slow">
+                <div className="h-full w-full rounded-[2.2rem] bg-premium-900" />
+              </div>
+              <img 
+                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&h=400&fit=crop" 
+                className="absolute inset-2 h-[calc(10rem-1rem)] w-[calc(10rem-1rem)] rounded-[2.1rem] object-cover border-4 border-premium-900"
+                alt="Avatar"
+              />
+              <Button size="icon" className="absolute bottom-2 right-2 h-10 w-10 rounded-2xl bg-cyan text-premium-900 shadow-cyan border-4 border-premium-900 hover:scale-110 transition-transform">
+                <Camera className="h-5 w-5" />
+              </Button>
+            </motion.div>
+
+            <div className="text-center md:text-left">
+              <h1 className="text-3xl font-bold text-white tracking-tight">John Doe</h1>
+              <p className="text-cyan font-medium mt-1">Full Stack Developer</p>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-4 text-muted-foreground text-sm">
+                <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4" /> New York, NY</span>
+                <span className="flex items-center gap-1.5"><School className="h-4 w-4" /> Stanford University</span>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="gap-2">
-              <Edit className="h-3.5 w-3.5" /> Edit Profile
+
+            <Button 
+              onClick={() => setIsDrawerOpen(true)}
+              className="w-full h-12 rounded-2xl bg-white/[0.05] border border-white/10 text-white hover:bg-white/10 font-bold transition-all"
+            >
+              <Edit3 className="h-5 w-5 mr-3" /> Edit Profile
             </Button>
-          </div>
-        </CardContent>
-      </Card>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-3">
-        {/* Bio & Skills */}
-        <div className="space-y-6 md:col-span-2">
-          <Card className="shadow-card">
-            <CardContent className="p-6">
-              <h2 className="mb-3 font-display text-lg font-semibold">About</h2>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                Passionate computer science student with a strong interest in full-stack development and 
-                machine learning. Currently working on projects involving natural language processing. 
-                Looking to connect with alumni in the tech industry for mentorship and guidance.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card">
-            <CardContent className="p-6">
-              <h2 className="mb-3 font-display text-lg font-semibold">Skills & Interests</h2>
-              <div className="flex flex-wrap gap-2">
-                {skills.map((skill) => (
-                  <Badge key={skill} variant="secondary" className="px-3 py-1">
-                    {skill}
-                  </Badge>
+            <div className="glass-card rounded-3xl p-6 space-y-4">
+              <h3 className="text-lg font-bold text-white mb-2">Social Links</h3>
+              <div className="space-y-3">
+                {[
+                  { icon: Github, label: "GitHub", link: "github.com/johndoe", color: "text-white" },
+                  { icon: Linkedin, label: "LinkedIn", link: "linkedin.com/in/johndoe", color: "text-cyan" },
+                  { icon: Twitter, label: "Twitter", link: "twitter.com/johndoe", color: "text-purple" },
+                ].map((social, i) => (
+                  <motion.a 
+                    key={i}
+                    href="#"
+                    whileHover={{ x: 5 }}
+                    className="flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <social.icon className={`h-5 w-5 ${social.color}`} />
+                      <span className="text-sm text-muted-foreground group-hover:text-white transition-colors">{social.label}</span>
+                    </div>
+                    <ExternalLink className="h-4 w-4 text-muted-foreground/30 group-hover:text-white transition-colors" />
+                  </motion.a>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="shadow-card">
-            <CardContent className="p-6">
-              <h2 className="mb-3 font-display text-lg font-semibold">Career Journey</h2>
-              <div className="space-y-4">
-                <div className="flex gap-3">
-                  <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <Briefcase className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">SDE Intern · Microsoft</p>
-                    <p className="text-xs text-muted-foreground">Summer 2023 · Hyderabad</p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <GraduationCap className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">B.Tech Computer Science · IIT Bombay</p>
-                    <p className="text-xs text-muted-foreground">2020 - 2024</p>
-                  </div>
-                </div>
+          {/* 📝 Detailed Info */}
+          <div className="flex-1 w-full space-y-8">
+            <motion.div 
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="glass-card rounded-[2.5rem] p-8 md:p-10"
+            >
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                <User className="h-6 w-6 text-cyan" /> About Me
+              </h2>
+              <p className="text-lg text-foreground/80 leading-relaxed">
+                Passionate about building highly interactive and visually stunning web applications. 
+                I specialize in React, Framer Motion, and modern UI/UX patterns. Currently focused on 
+                creating the next generation of college networking experiences.
+              </p>
+            </motion.div>
+
+            <motion.div 
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="glass-card rounded-[2.5rem] p-8 md:p-10"
+            >
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                <Sparkles className="h-6 w-6 text-purple" /> Skills & Expertise
+              </h2>
+              <div className="flex flex-wrap gap-3">
+                {skills.map((skill, i) => (
+                  <motion.div
+                    key={skill}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.3 + (i * 0.05) }}
+                    whileHover={{ scale: 1.05, backgroundColor: "rgba(0, 245, 255, 0.1)" }}
+                  >
+                    <Badge className="bg-white/5 border-white/10 text-white rounded-xl px-4 py-2 text-sm font-medium hover:text-cyan hover:border-cyan/30 transition-all cursor-default">
+                      {skill}
+                    </Badge>
+                  </motion.div>
+                ))}
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  className="rounded-xl border border-dashed border-white/20 px-4 py-2 text-sm text-muted-foreground hover:text-white hover:border-white/40 transition-all flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" /> Add Skill
+                </motion.button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </motion.div>
 
-        {/* Stats sidebar */}
-        <div className="space-y-6">
-          <Card className="shadow-card">
-            <CardContent className="p-6 text-center">
-              <p className="font-display text-3xl font-bold text-primary">128</p>
-              <p className="text-sm text-muted-foreground">Connections</p>
-            </CardContent>
-          </Card>
-          <Card className="shadow-card">
-            <CardContent className="p-6 text-center">
-              <p className="font-display text-3xl font-bold text-primary">45</p>
-              <p className="text-sm text-muted-foreground">Profile Views</p>
-            </CardContent>
-          </Card>
+            {/* 🔥 Stats Section */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: "Connections", value: "1.2k+", color: "cyan" },
+                { label: "Matches", value: "48", color: "purple" },
+                { label: "Profile Views", value: "892", color: "pink" },
+                { label: "Posts", value: "15", color: "cyan" },
+              ].map((stat, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 + (i * 0.1) }}
+                  className="glass-card rounded-3xl p-6 text-center"
+                >
+                  <h4 className="text-2xl font-bold text-white">{stat.value}</h4>
+                  <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">{stat.label}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* 🚀 Slide-in Edit Drawer */}
+      <AnimatePresence>
+        {isDrawerOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsDrawerOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+            />
+            <motion.div 
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed right-0 top-0 bottom-0 w-full max-w-xl glass-dark border-l border-white/10 z-[70] shadow-2xl p-8 overflow-y-auto no-scrollbar"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-bold text-white">Edit Profile</h2>
+                <Button variant="ghost" size="icon" onClick={() => setIsDrawerOpen(false)} className="rounded-xl hover:bg-white/10">
+                  <X className="h-6 w-6" />
+                </Button>
+              </div>
+
+              <div className="space-y-8">
+                <div className="space-y-4">
+                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Basic Information</h3>
+                   <div className="grid grid-cols-2 gap-4">
+                     <div className="space-y-2">
+                       <label className="text-sm text-foreground/70 ml-1">Full Name</label>
+                       <Input placeholder="John Doe" className="bg-white/[0.03] border-white/10 rounded-xl h-12" />
+                     </div>
+                     <div className="space-y-2">
+                       <label className="text-sm text-foreground/70 ml-1">Title</label>
+                       <Input placeholder="Full Stack Developer" className="bg-white/[0.03] border-white/10 rounded-xl h-12" />
+                     </div>
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-sm text-foreground/70 ml-1">Bio</label>
+                     <Textarea 
+                       placeholder="Tell us about yourself..." 
+                       className="bg-white/[0.03] border-white/10 rounded-xl min-h-[120px] resize-none"
+                     />
+                   </div>
+                </div>
+
+                <div className="space-y-4">
+                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Education & Location</h3>
+                   <div className="space-y-2">
+                     <label className="text-sm text-foreground/70 ml-1">University</label>
+                     <Input placeholder="Stanford University" className="bg-white/[0.03] border-white/10 rounded-xl h-12 transition-all focus:border-cyan/50 focus:ring-cyan/20" />
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-sm text-foreground/70 ml-1">Location</label>
+                     <Input placeholder="New York, NY" className="bg-white/[0.03] border-white/10 rounded-xl h-12 transition-all focus:border-cyan/50 focus:ring-cyan/20" />
+                   </div>
+                </div>
+
+                <div className="pt-6 flex gap-4">
+                  <Button className="flex-1 h-14 rounded-2xl bg-cyan text-premium-900 font-bold shadow-cyan hover:scale-[1.02] active:scale-[0.98] transition-all">
+                    <Check className="h-5 w-5 mr-3" /> Save Changes
+                  </Button>
+                  <Button variant="ghost" onClick={() => setIsDrawerOpen(false)} className="flex-1 h-14 rounded-2xl border border-white/10 hover:bg-white/5 text-white">
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
     </div>
   );
-};
-
-export default Profile;
-
+}
