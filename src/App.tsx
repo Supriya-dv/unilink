@@ -4,7 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -22,6 +23,37 @@ import { AppLayout } from "./components/AppLayout";
 
 const queryClient = new QueryClient();
 
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Public Routes */}
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* ⭐ Start Match Page (Full Screen) */}
+        <Route path="/start-match" element={<StartMatch />} />
+
+        {/* App Layout Routes */}
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/discover" element={<Discovery />} />
+          <Route path="/connections" element={<Connections />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/careers" element={<CareerJourneys />} />
+        </Route>
+
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -30,32 +62,8 @@ function App() {
         <Sonner />
 
         <BrowserRouter>
-          <Routes>
-
-            {/* Public Routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-
-            {/* ⭐ Start Match Page (Full Screen) */}
-            <Route path="/start-match" element={<StartMatch />} />
-
-            {/* App Layout Routes */}
-            <Route element={<AppLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/discover" element={<Discovery />} />
-              <Route path="/connections" element={<Connections />} />
-              <Route path="/messages" element={<Messages />} />
-              <Route path="/careers" element={<CareerJourneys />} />
-            </Route>
-
-            {/* 404 */}
-            <Route path="*" element={<NotFound />} />
-
-          </Routes>
+          <AnimatedRoutes />
         </BrowserRouter>
-
       </TooltipProvider>
     </QueryClientProvider>
   );

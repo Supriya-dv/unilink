@@ -62,9 +62,11 @@ const itemVariants = {
   }
 };
 
+import { PageTransition } from "@/components/PageTransition";
+
 const Dashboard = () => {
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-8">
+    <PageTransition className="container max-w-7xl mx-auto px-4 py-8">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -201,7 +203,7 @@ const Dashboard = () => {
           </div>
         </div>
       </motion.div>
-    </div>
+    </PageTransition>
   );
 };
 

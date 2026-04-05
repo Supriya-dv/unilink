@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect } from "react";
 
 export const AppLayout = () => {
@@ -11,6 +11,13 @@ export const AppLayout = () => {
   const springConfig = { damping: 25, stiffness: 150 };
   const cursorX = useSpring(mouseX, springConfig);
   const cursorY = useSpring(mouseY, springConfig);
+
+  // Parallax background blobs
+  const bgX1 = useSpring(useTransform(mouseX, [0, typeof window !== 'undefined' ? window.innerWidth : 1000], [-30, 30]), springConfig);
+  const bgY1 = useSpring(useTransform(mouseY, [0, typeof window !== 'undefined' ? window.innerHeight : 1000], [-30, 30]), springConfig);
+  
+  const bgX2 = useSpring(useTransform(mouseX, [0, typeof window !== 'undefined' ? window.innerWidth : 1000], [30, -30]), springConfig);
+  const bgY2 = useSpring(useTransform(mouseY, [0, typeof window !== 'undefined' ? window.innerHeight : 1000], [30, -30]), springConfig);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -35,31 +42,26 @@ export const AppLayout = () => {
       {/* 🔮 Background Animated Blobs */}
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[#050505]">
         <motion.div
-          animate={{
-            x: [0, 100, 0],
-            y: [0, 50, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute -top-[10%] -left-[10%] h-[50%] w-[50%] rounded-full bg-cyan/10 blur-[120px]"
-        />
+           style={{ x: bgX1, y: bgY1 }}
+           className="absolute inset-0 z-0 h-full w-full"
+        >
+          <motion.div
+            animate={{ x: [0, 100, 0], y: [0, 50, 0], scale: [1, 1.2, 1] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -top-[10%] -left-[10%] h-[50%] w-[50%] rounded-full bg-cyan/10 blur-[120px]"
+          />
+        </motion.div>
+        
         <motion.div
-          animate={{
-            x: [0, -100, 0],
-            y: [0, 80, 0],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-[20%] -right-[10%] h-[40%] w-[40%] rounded-full bg-purple/10 blur-[120px]"
-        />
+           style={{ x: bgX2, y: bgY2 }}
+           className="absolute inset-0 z-0 h-full w-full"
+        >
+          <motion.div
+            animate={{ x: [0, -100, 0], y: [0, 80, 0], scale: [1, 1.1, 1] }}
+            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[20%] -right-[10%] h-[40%] w-[40%] rounded-full bg-purple/10 blur-[120px]"
+          />
+        </motion.div>
         <motion.div
           animate={{
             x: [0, 50, 0],

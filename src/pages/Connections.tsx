@@ -22,10 +22,13 @@ const initialConnections = {
   ],
 };
 
+import { PageTransition } from "@/components/PageTransition";
+
 export default function Connections() {
   const [activeTab, setActiveTab] = useState("matches");
   const [searchQuery, setSearchQuery] = useState("");
   const [localConnections, setLocalConnections] = useState(initialConnections);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadRequests = useCallback(() => {
     const currentUserId = 0;
@@ -58,11 +61,16 @@ export default function Connections() {
         status: "Online",
       }));
 
-    setLocalConnections({
-      matches: [...initialConnections.matches, ...matches],
-      requests: [...initialConnections.requests, ...receivedRequests],
-      sent: [...initialConnections.sent, ...sentRequests],
-    });
+    // Simulate network delay for premium feel
+    setIsLoading(true);
+    setTimeout(() => {
+      setLocalConnections({
+        matches: [...initialConnections.matches, ...matches],
+        requests: [...initialConnections.requests, ...receivedRequests],
+        sent: [...initialConnections.sent, ...sentRequests],
+      });
+      setIsLoading(false);
+    }, 600);
   }, []);
 
   useEffect(() => {
@@ -87,7 +95,7 @@ export default function Connections() {
   const currentList = localConnections[activeTab as keyof typeof localConnections] || [];
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-8">
+    <PageTransition className="container max-w-6xl mx-auto px-4 py-8">
       
       {/* ✨ Header Section */}
       <motion.div 
@@ -149,7 +157,30 @@ export default function Connections() {
       {/* 🚀 Connection Cards List */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
         <AnimatePresence mode="popLayout">
-          {currentList.map((item, i) => (
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <motion.div
+                key={`skeleton-${i}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="glass-card border-none rounded-3xl p-4 md:p-6"
+              >
+                <div className="flex items-center gap-6">
+                  <div className="h-16 w-16 rounded-[1.25rem] bg-white/5 animate-pulse" />
+                  <div className="flex-1 space-y-3">
+                    <div className="h-5 w-1/3 bg-white/5 rounded animate-pulse" />
+                    <div className="h-4 w-1/4 bg-white/5 rounded animate-pulse" />
+                    <div className="flex gap-3 mt-4 pt-2">
+                       <div className="h-9 w-32 bg-white/5 rounded-xl animate-pulse" />
+                       <div className="h-9 w-24 bg-white/5 rounded-xl animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          ) : currentList.map((item, i) => (
             <motion.div
               key={item.id}
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -222,7 +253,7 @@ export default function Connections() {
           ))}
         </AnimatePresence>
 
-        {currentList.length === 0 && (
+        {!isLoading && currentList.length === 0 && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -242,6 +273,6 @@ export default function Connections() {
         )}
       </div>
 
-    </div>
+    </PageTransition>
   );
 }

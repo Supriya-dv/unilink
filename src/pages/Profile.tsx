@@ -12,11 +12,13 @@ import { Textarea } from "@/components/ui/textarea";
 
 const skills = ["React", "TypeScript", "UI Design", "Product Management", "Node.js", "Python"];
 
+import { PageTransition } from "@/components/PageTransition";
+
 export default function Profile() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   
   return (
-    <div className="min-h-screen pb-20">
+    <PageTransition className="min-h-screen pb-20">
       
       {/* 🌆 Cover Image Section */}
       <div className="relative h-64 md:h-80 w-full overflow-hidden">
@@ -190,7 +192,7 @@ export default function Profile() {
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              transition={{ type: "spring", bounce: 0.2, damping: 20, stiffness: 150 }}
               className="fixed right-0 top-0 bottom-0 w-full max-w-xl glass-dark border-l border-white/10 z-[70] shadow-2xl p-8 overflow-y-auto no-scrollbar"
             >
               <div className="flex items-center justify-between mb-8">
@@ -248,6 +250,6 @@ export default function Profile() {
         )}
       </AnimatePresence>
 
-    </div>
+    </PageTransition>
   );
 }

@@ -198,6 +198,8 @@ const DiscoveryCard = memo(({ user, isTop, onSwipe }: { user: UserCard, isTop: b
 
 DiscoveryCard.displayName = "DiscoveryCard";
 
+import { PageTransition } from "@/components/PageTransition";
+
 export default function Discovery() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -217,7 +219,12 @@ export default function Discovery() {
     setCurrentIndex(prev => prev + 1);
   };
 
+  const [showHeartBurst, setShowHeartBurst] = useState(false);
+
   const handleLike = () => {
+    setShowHeartBurst(true);
+    setTimeout(() => setShowHeartBurst(false), 1000);
+
     const likedUser = initialUsers[currentIndex];
     if (likedUser) {
       const currentUserId = 0; // John Doe (from Profile page)
@@ -258,13 +265,15 @@ export default function Discovery() {
         });
       }
     }
-    handleSwipe();
+    
+    // Delay swipe slightly so heart burst can be seen
+    setTimeout(handleSwipe, 300);
   };
 
   const usersLeft = initialUsers.length - currentIndex;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 md:p-8 relative overflow-visible">
+    <PageTransition className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 md:p-8 relative overflow-visible">
       
       {/* ✨ Discovery Header */}
       <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center mb-8 relative z-30">
@@ -275,6 +284,38 @@ export default function Discovery() {
       </motion.div>
 
       <div className="relative w-full max-w-[400px] aspect-[3/4.5] perspective-1000 z-10">
+        
+        {/* ❤️ Heart Burst Overlay */}
+        <AnimatePresence>
+          {showHeartBurst && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0, rotate: -45 }}
+              animate={{ scale: [0, 1.5, 1.2], opacity: [0, 1, 0], rotate: 0 }}
+              exit={{ opacity: 0, scale: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
+            >
+              <Heart className="h-48 w-48 fill-cyan text-cyan drop-shadow-[0_0_50px_rgba(0,245,255,0.8)]" />
+              
+              {/* Particle sparks */}
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
+                  animate={{ 
+                    opacity: 0, 
+                    scale: Math.random() * 2 + 1,
+                    x: (Math.random() - 0.5) * 300, 
+                    y: (Math.random() - 0.5) * 300 
+                  }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="absolute h-3 w-3 rounded-full bg-cyan shadow-[0_0_10px_cyan]"
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {usersLeft > 0 ? (
           <AnimatePresence>
             {/* We render the current card AND the next card behind it */}
@@ -341,6 +382,6 @@ export default function Discovery() {
         Discovering connections around <span className="text-white">New York</span>
       </p>
 
-    </div>
+    </PageTransition>
   );
 }
