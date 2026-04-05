@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 type UserCard = {
   id: number;
@@ -216,6 +217,50 @@ export default function Discovery() {
     setCurrentIndex(prev => prev + 1);
   };
 
+  const handleLike = () => {
+    const likedUser = initialUsers[currentIndex];
+    if (likedUser) {
+      const currentUserId = 0; // John Doe (from Profile page)
+      const existingRequests = JSON.parse(localStorage.getItem("requests") || "[]");
+      
+      // Check if already liked (avoid duplicates)
+      const isDuplicate = existingRequests.some(
+        (req: any) => req.from === currentUserId && req.to === likedUser.id
+      );
+
+      if (!isDuplicate) {
+        const newRequest = {
+          id: Date.now(),
+          from: currentUserId,
+          to: likedUser.id,
+          status: "pending",
+          user: {
+            id: likedUser.id,
+            name: likedUser.name,
+            role: "Student", // Defaulting role since UserCard doesn't have it
+            dept: likedUser.occupation,
+            avatar: likedUser.name.split(' ').map(n => n[0]).join(''),
+            color: "cyan", // Defaulting color
+            image: likedUser.image
+          }
+        };
+        
+        const updatedRequests = [...existingRequests, newRequest];
+        localStorage.setItem("requests", JSON.stringify(updatedRequests));
+        
+        // Trigger UI update across pages
+        window.dispatchEvent(new Event("requestUpdated"));
+        
+        // Show success toast
+        toast.success(`Request sent to ${likedUser.name}!`, {
+          description: "They'll see your interest in their network tab.",
+          className: "glass-card border-cyan/20 text-white",
+        });
+      }
+    }
+    handleSwipe();
+  };
+
   const usersLeft = initialUsers.length - currentIndex;
 
   return (
@@ -283,7 +328,7 @@ export default function Discovery() {
           
           <motion.button
             whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}
-            onClick={handleSwipe}
+            onClick={handleLike}
             className="h-20 w-20 rounded-full glass-dark border border-cyan/30 flex items-center justify-center text-cyan shadow-cyan transition-all bg-premium-800"
           >
             <Heart className="h-10 w-10 fill-cyan" />

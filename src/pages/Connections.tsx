@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserCheck, UserPlus, Send, Search, Filter, MoreVertical, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,13 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-const tabs = [
-  { id: "matches", label: "Matches", icon: UserCheck, count: 24, color: "cyan" },
-  { id: "requests", label: "Requests", icon: UserPlus, count: 12, color: "purple" },
-  { id: "sent", label: "Sent", icon: Send, count: 8, color: "pink" },
-];
-
-const connections = {
+const initialConnections = {
   matches: [
     { id: 1, name: "Priya Sharma", role: "Alumni", dept: "Computer Science", avatar: "PS", status: "Online", color: "cyan" },
     { id: 2, name: "Rahul Verma", role: "Student", dept: "Electrical Eng.", avatar: "RV", status: "Away", color: "purple" },
@@ -31,8 +25,66 @@ const connections = {
 export default function Connections() {
   const [activeTab, setActiveTab] = useState("matches");
   const [searchQuery, setSearchQuery] = useState("");
+  const [localConnections, setLocalConnections] = useState(initialConnections);
 
-  const currentList = connections[activeTab as keyof typeof connections] || [];
+  const loadRequests = useCallback(() => {
+    const currentUserId = 0;
+    const storedRequests = JSON.parse(localStorage.getItem("requests") || "[]");
+    
+    // Filter requests sent by current user
+    const sentRequests = storedRequests
+      .filter((req: any) => req.from === currentUserId && req.status === "pending")
+      .map((req: any) => ({
+        ...req.user,
+        id: `dynamic-${req.id}`, // Avoid ID collisions
+        status: "Pending",
+      }));
+
+    // Filter requests received by current user (mocking for now)
+    const receivedRequests = storedRequests
+      .filter((req: any) => req.to === currentUserId && req.status === "pending")
+      .map((req: any) => ({
+        ...req.user,
+        id: `dynamic-${req.id}`,
+        time: "Just now",
+      }));
+
+    // Filter matches
+    const matches = storedRequests
+      .filter((req: any) => (req.from === currentUserId || req.to === currentUserId) && req.status === "accepted")
+      .map((req: any) => ({
+        ...req.user,
+        id: `dynamic-${req.id}`,
+        status: "Online",
+      }));
+
+    setLocalConnections({
+      matches: [...initialConnections.matches, ...matches],
+      requests: [...initialConnections.requests, ...receivedRequests],
+      sent: [...initialConnections.sent, ...sentRequests],
+    });
+  }, []);
+
+  useEffect(() => {
+    loadRequests();
+    
+    // Listen for cross-tab or same-page updates
+    window.addEventListener("requestUpdated", loadRequests);
+    window.addEventListener("storage", loadRequests);
+    
+    return () => {
+      window.removeEventListener("requestUpdated", loadRequests);
+      window.removeEventListener("storage", loadRequests);
+    };
+  }, [loadRequests]);
+
+  const tabs = [
+    { id: "matches", label: "Matches", icon: UserCheck, count: localConnections.matches.length, color: "cyan" },
+    { id: "requests", label: "Requests", icon: UserPlus, count: localConnections.requests.length, color: "purple" },
+    { id: "sent", label: "Sent", icon: Send, count: localConnections.sent.length, color: "pink" },
+  ];
+
+  const currentList = localConnections[activeTab as keyof typeof localConnections] || [];
 
   return (
     <div className="container max-w-6xl mx-auto px-4 py-8">
