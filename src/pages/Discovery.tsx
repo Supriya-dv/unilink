@@ -2,99 +2,50 @@ import React, { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
 import { 
   Heart, X, MapPin, Briefcase, School, 
-  Sparkles, Zap, Info, ShieldCheck 
+  Sparkles, Zap, Info, ShieldCheck, Loader2, Crown, MessageSquare, Filter, SlidersHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { api, discoveryApi, type DiscoveryCardType } from "@/lib/api";
+import { PageTransition } from "@/components/PageTransition";
 
-type UserCard = {
-  id: number;
-  name: string;
-  age: number;
-  location: string;
-  distance: string;
-  occupation: string;
-  education: string;
-  bio: string;
-  image: string;
-  interests: string[];
-  matchScore: number;
-};
-
-const initialUsers: UserCard[] = [
-  {
-    id: 1,
-    name: "Sophia",
-    age: 23,
-    location: "Brooklyn, NY",
-    distance: "2 miles",
-    occupation: "Product Designer",
-    education: "NYU",
-    bio: "Creating beautiful things • Coffee addict • Always exploring new art galleries.",
-    image: "https://images.unsplash.com/photo-1494790108777-766fd36f7b41?w=600&h=800&fit=crop",
-    interests: ["Design", "Travel", "Art"],
-    matchScore: 98,
-  },
-  {
-    id: 2,
-    name: "James",
-    age: 24,
-    location: "SoHo, NYC",
-    distance: "1.5 miles",
-    occupation: "Software Engineer",
-    education: "Columbia",
-    bio: "Building cool stuff • Guitar player • Looking for someone to join my jam sessions.",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&h=800&fit=crop",
-    interests: ["Coding", "Music", "Tech"],
-    matchScore: 85,
-  },
-  {
-    id: 3,
-    name: "Emma",
-    age: 22,
-    location: "Williamsburg",
-    distance: "3 miles",
-    occupation: "Marketing Intern",
-    education: "Parsons",
-    bio: "Art enthusiast • Plant mom • Let's go for a walk in the park!",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=800&fit=crop",
-    interests: ["Art", "Fashion", "Nature"],
-    matchScore: 92,
-  },
-  {
-    id: 4,
-    name: "Leo",
-    age: 25,
-    location: "Manhattan",
-    distance: "4 miles",
-    occupation: "Content Creator",
-    education: "NYU",
-    bio: "Storyteller & Visionary. Exploring the intersection of tech and humanity.",
-    image: "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&h=800&fit=crop",
-    interests: ["Photography", "Philosophy", "Tech"],
-    matchScore: 78,
-  }
-];
-
-// ⭐ DiscoveryCard Sub-component
-// Memoized to prevent re-renders when parent state changes but props don't
-const DiscoveryCard = memo(({ user, isTop, onSwipe }: { user: UserCard, isTop: boolean, onSwipe?: () => void }) => {
+const DiscoveryCard = memo(({ 
+  user, 
+  isTop, 
+  onSwipe, 
+  userTier, 
+  onDirectMessage 
+}: { 
+  user: DiscoveryCardType, 
+  isTop: boolean, 
+  onSwipe?: (action: 'like' | 'pass') => void,
+  userTier: string,
+  onDirectMessage?: (user: DiscoveryCardType) => void
+}) => {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-25, 25]);
   const opacity = useTransform(x, [-200, -150, 0, 150, 200], [0, 1, 1, 1, 0]);
-  const yesOpacity = useTransform(x, [50, 150], [0, 1]);
-  const noOpacity = useTransform(x, [-50, -150], [0, 1]);
+  const yesOpacity = useTransform(x, [0, 150], [0, 1]);
+  const noOpacity = useTransform(x, [-150, 0], [1, 0]);
 
-  const handleDragEnd = (_: any, info: PanInfo) => {
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (info.offset.x > 100) {
-      onSwipe?.();
+      onSwipe?.('like');
     } else if (info.offset.x < -100) {
-      onSwipe?.();
-    } else {
-      x.set(0);
+      onSwipe?.('pass');
     }
   };
+
+  const displayName = user.fullName;
+  const displayAge = user.age || 21;
+  const displayOccupation = user.occupationTitle || (user.role === 'alumni' ? 'Alumni' : 'Student');
+  const displayUniversity = user.university || user.department || 'Campus';
+  const displayLocation = user.location || 'New York, NY';
+  const displayBio = user.bio || 'Passionate about connecting and building great things together.';
+  const avatarUrl = user.avatarUrl || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=800&fit=crop`;
+  const matchScore = Math.floor(Math.random() * 20) + 80;
 
   return (
     <motion.div
@@ -107,86 +58,94 @@ const DiscoveryCard = memo(({ user, isTop, onSwipe }: { user: UserCard, isTop: b
       exit={{ x: x.get() > 0 ? 1000 : -1000, opacity: 0, transition: { duration: 0.3 } }}
       className={`absolute inset-0 z-10 touch-none will-change-transform ${isTop ? "cursor-grab active:cursor-grabbing" : ""}`}
     >
-      {/* 🔴 Swipe Indicators (only for top card) */}
+      {/* Swipe Indicators */}
       {isTop && (
         <>
-          <motion.div style={{ opacity: yesOpacity }} className="absolute top-10 left-10 z-20 border-4 border-cyan rounded-xl px-4 py-2 rotate-[-15deg] pointer-events-none">
-            <span className="text-3xl font-bold text-cyan uppercase tracking-widest">Like</span>
+          <motion.div style={{ opacity: yesOpacity }} className="absolute top-10 left-10 z-20 border-4 border-cyan-500 rounded-xl px-4 py-2 rotate-[-15deg] pointer-events-none">
+            <span className="text-3xl font-bold text-cyan-600 uppercase tracking-widest">Like</span>
           </motion.div>
-          <motion.div style={{ opacity: noOpacity }} className="absolute top-10 right-10 z-20 border-4 border-pink rounded-xl px-4 py-2 rotate-[15deg] pointer-events-none">
-            <span className="text-3xl font-bold text-pink uppercase tracking-widest">Nope</span>
+          <motion.div style={{ opacity: noOpacity }} className="absolute top-10 right-10 z-20 border-4 border-pink-500 rounded-xl px-4 py-2 rotate-[15deg] pointer-events-none">
+            <span className="text-3xl font-bold text-pink-600 uppercase tracking-widest">Nope</span>
           </motion.div>
         </>
       )}
 
-      {/* 🔮 Card Frame */}
-      <div className="w-full h-full rounded-[2.5rem] overflow-hidden glass-card relative group shadow-2xl">
+      {/* Card Frame */}
+      <div className="w-full h-full rounded-[2.5rem] overflow-hidden glass-card relative group shadow-xl bg-white/70 border-black/[0.05]">
         
-        {/* 🔥 GPU Optimized Image Container */}
         <div className="absolute inset-0 z-0">
           <img 
-            src={user.image} 
-            alt={user.name}
+            src={avatarUrl} 
+            alt={displayName}
             style={{ transform: "translateZ(0)" }}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
         </div>
         
-        {/* Overlays */}
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-premium-900 via-premium-900/60 to-transparent p-8 flex flex-col justify-end z-10">
+        {/* Soft text overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent p-8 flex flex-col justify-end z-10">
           
-          {/* User Info Header */}
           <div className="flex items-end justify-between mb-4">
             <div>
               <h2 className="text-4xl font-bold text-white flex items-center gap-2">
-                {user.name}, {user.age}
-                <ShieldCheck className="h-6 w-6 text-cyan" />
+                {displayName}, {displayAge}
+                <ShieldCheck className="h-6 w-6 text-cyan-400" />
               </h2>
-              <div className="flex items-center gap-2 text-muted-foreground mt-1">
+              <div className="flex items-center gap-2 text-slate-300 mt-1">
                 <MapPin className="h-4 w-4" />
-                <span className="text-sm">{user.location} • {user.distance}</span>
+                <span className="text-sm">{displayLocation}</span>
               </div>
             </div>
             
-            {/* Match Percentage SVG */}
             <div className="flex flex-col items-center">
-              <div className="h-16 w-16 rounded-full border-2 border-cyan/30 flex items-center justify-center p-1 relative">
+              <div className="h-16 w-16 rounded-full border-2 border-cyan-400/30 flex items-center justify-center p-1 relative">
                  <svg className="absolute inset-0 w-full h-full -rotate-90">
                    <circle cx="32" cy="32" r="28" fill="transparent" stroke="currentColor" strokeWidth="4" className="text-white/10" />
                    <motion.circle 
                      cx="32" cy="32" r="28" fill="transparent" stroke="currentColor" strokeWidth="4"
                      strokeDasharray={176} initial={{ strokeDashoffset: 176 }}
-                     animate={{ strokeDashoffset: 176 - (176 * user.matchScore) / 100 }}
+                     animate={{ strokeDashoffset: 176 - (176 * matchScore) / 100 }}
                      transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
-                     className="text-cyan drop-shadow-[0_0_8px_rgba(0,245,255,0.5)]"
+                     className="text-cyan-400 drop-shadow-[0_0_8px_rgba(0,245,255,0.5)]"
                    />
                  </svg>
-                 <span className="text-xs font-bold text-cyan">{user.matchScore}%</span>
+                 <span className="text-xs font-bold text-cyan-400">{matchScore}%</span>
               </div>
-              <span className="text-[10px] text-muted-foreground mt-1 uppercase tracking-tighter">Match</span>
+              <span className="text-[10px] text-slate-300 mt-1 uppercase tracking-tighter">Match</span>
             </div>
           </div>
 
-          <p className="text-white/80 text-sm line-clamp-2 mb-4 leading-relaxed font-medium">
-            {user.bio}
+          <p className="text-slate-100 text-sm line-clamp-2 mb-4 leading-relaxed font-medium">
+            {displayBio}
           </p>
 
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="bg-white/5 border-white/10 rounded-xl px-3 py-1 text-xs text-white flex gap-1.5 items-center">
-              <Briefcase className="h-3 w-3" /> {user.occupation}
+            <Badge variant="outline" className="bg-white/10 border-white/20 rounded-xl px-3 py-1 text-xs text-white flex gap-1.5 items-center">
+              <Briefcase className="h-3 w-3" /> {displayOccupation}
             </Badge>
-            <Badge variant="outline" className="bg-white/5 border-white/10 rounded-xl px-3 py-1 text-xs text-white flex gap-1.5 items-center">
-              <School className="h-3 w-3" /> {user.education}
+            <Badge variant="outline" className="bg-white/10 border-white/20 rounded-xl px-3 py-1 text-xs text-white flex gap-1.5 items-center">
+              <School className="h-3 w-3" /> {displayUniversity}
             </Badge>
-            {user.interests.map(interest => (
-              <Badge key={interest} variant="outline" className="bg-cyan/10 border-cyan/20 rounded-xl px-3 py-1 text-xs text-cyan">
+            {user.interests && user.interests.map(interest => (
+              <Badge key={interest} variant="outline" className="bg-cyan-500/20 border-cyan-400/30 rounded-xl px-3 py-1 text-xs text-cyan-300">
                 #{interest}
               </Badge>
             ))}
           </div>
         </div>
 
-        <div className="absolute top-4 right-4 z-20">
+        {/* Top-Right Action Controls */}
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+          {/* Alumni Direct VIP Feature: Direct DM without matching */}
+          {userTier === "alumni_direct" && (
+            <Button 
+              onClick={(e) => { e.stopPropagation(); onDirectMessage?.(user); }}
+              size="sm" 
+              className="h-10 px-4 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-lg flex items-center gap-1.5"
+            >
+              <MessageSquare className="h-4 w-4" /> Direct DM
+            </Button>
+          )}
           <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white">
             <Info className="h-5 w-5" />
           </Button>
@@ -198,94 +157,167 @@ const DiscoveryCard = memo(({ user, isTop, onSwipe }: { user: UserCard, isTop: b
 
 DiscoveryCard.displayName = "DiscoveryCard";
 
-import { PageTransition } from "@/components/PageTransition";
-
 export default function Discovery() {
+  const navigate = useNavigate();
+  const [cards, setCards] = useState<DiscoveryCardType[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showHeartBurst, setShowHeartBurst] = useState(false);
 
-  // ✅ Image Preloading Engine
+  // User subscription tier state
+  const isPremium = localStorage.getItem("unilink_is_premium") === "true";
+  const userTier = localStorage.getItem("unilink_user_tier") || (isPremium ? "pro" : "free");
+
+  // Free Tier Daily Swipe Limit counter (Max 5/day for free users)
+  const [swipesCount, setSwipesCount] = useState(() => {
+    return parseInt(localStorage.getItem("unilink_swipes_today") || "0", 10);
+  });
+
+  // Alumni Direct Filter state
+  const [roleFilter, setRoleFilter] = useState<"all" | "alumni" | "student">("all");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
+
+  const fetchCards = async () => {
+    try {
+      setIsLoading(true);
+      const res = await discoveryApi.getCards();
+      setCards(res.cards);
+      setCurrentIndex(0);
+    } catch {
+      toast.error("Failed to load networking suggestions.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const preload = (idx: number) => {
-      if (initialUsers[idx]) {
-        const img = new Image();
-        img.src = initialUsers[idx].image;
-      }
-    };
-    preload(currentIndex + 1);
-    preload(currentIndex + 2);
-  }, [currentIndex]);
+    fetchCards();
 
-  const handleSwipe = () => {
+    const handleTierChange = () => {
+      // Force component re-render when tier changes
+      window.location.reload();
+    };
+    window.addEventListener("premiumUpdated", handleTierChange);
+    return () => window.removeEventListener("premiumUpdated", handleTierChange);
+  }, []);
+
+  const handleSwipeAction = async (action: 'like' | 'pass') => {
+    // Check Free tier limit
+    if (userTier === "free" && swipesCount >= 5) {
+      toast.error("Daily Swipe Limit Reached! Upgrade to Pro for unlimited swipes.");
+      return;
+    }
+
+    const swipedUser = filteredCards[currentIndex];
+    if (!swipedUser) return;
+
+    if (action === 'like') {
+      setShowHeartBurst(true);
+      setTimeout(() => setShowHeartBurst(false), 1000);
+    }
+
+    try {
+      const res = await discoveryApi.swipe(swipedUser._id, action);
+      if (res.isMatch) {
+        toast.success(`You matched with ${swipedUser.fullName}! 🚀`, {
+          description: "Go to Messages to start chatting.",
+        });
+      } else if (action === 'like') {
+        toast.success(`Request sent to ${swipedUser.fullName}!`, {
+          description: "They will see your profile in their connection requests.",
+        });
+      }
+      
+      // Increment free daily swipes counter
+      if (userTier === "free") {
+        const nextCount = swipesCount + 1;
+        setSwipesCount(nextCount);
+        localStorage.setItem("unilink_swipes_today", nextCount.toString());
+      }
+
+      window.dispatchEvent(new Event("requestUpdated"));
+    } catch {
+      toast.error("Action could not be saved.");
+    }
+
     setCurrentIndex(prev => prev + 1);
   };
 
-  const [showHeartBurst, setShowHeartBurst] = useState(false);
-
-  const handleLike = () => {
-    setShowHeartBurst(true);
-    setTimeout(() => setShowHeartBurst(false), 1000);
-
-    const likedUser = initialUsers[currentIndex];
-    if (likedUser) {
-      const currentUserId = 0; // John Doe (from Profile page)
-      const existingRequests = JSON.parse(localStorage.getItem("requests") || "[]");
-      
-      // Check if already liked (avoid duplicates)
-      const isDuplicate = existingRequests.some(
-        (req: any) => req.from === currentUserId && req.to === likedUser.id
-      );
-
-      if (!isDuplicate) {
-        const newRequest = {
-          id: Date.now(),
-          from: currentUserId,
-          to: likedUser.id,
-          status: "pending",
-          user: {
-            id: likedUser.id,
-            name: likedUser.name,
-            role: "Student", // Defaulting role since UserCard doesn't have it
-            dept: likedUser.occupation,
-            avatar: likedUser.name.split(' ').map(n => n[0]).join(''),
-            color: "cyan", // Defaulting color
-            image: likedUser.image
-          }
-        };
-        
-        const updatedRequests = [...existingRequests, newRequest];
-        localStorage.setItem("requests", JSON.stringify(updatedRequests));
-        
-        // Trigger UI update across pages
-        window.dispatchEvent(new Event("requestUpdated"));
-        
-        // Show success toast
-        toast.success(`Request sent to ${likedUser.name}!`, {
-          description: "They'll see your interest in their network tab.",
-          className: "glass-card border-cyan/20 text-white",
-        });
-      }
-    }
-    
-    // Delay swipe slightly so heart burst can be seen
-    setTimeout(handleSwipe, 300);
+  const handleDirectMessage = (user: DiscoveryCardType) => {
+    navigate("/messages", { state: { selectUser: user } });
   };
 
-  const usersLeft = initialUsers.length - currentIndex;
+  // Filter cards based on Alumni Direct advanced filters
+  const filteredCards = cards.filter(card => {
+    if (roleFilter !== "all" && card.role !== roleFilter) return false;
+    if (departmentFilter !== "all" && card.department && !card.department.toLowerCase().includes(departmentFilter.toLowerCase())) return false;
+    return true;
+  });
+
+  const usersLeft = filteredCards.length - currentIndex;
+  const isFreeLimitReached = userTier === "free" && swipesCount >= 5;
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4">
+        <Loader2 className="h-10 w-10 text-cyan-600 animate-spin mb-4" />
+        <p className="text-slate-500 font-medium">Finding potential matches...</p>
+      </div>
+    );
+  }
 
   return (
     <PageTransition className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 md:p-8 relative overflow-visible">
       
-      {/* ✨ Discovery Header */}
-      <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center mb-8 relative z-30">
-        <h1 className="text-3xl font-bold text-white flex items-center justify-center gap-2">
-          Discover <Sparkles className="h-6 w-6 text-cyan animate-pulse" />
+      {/* Header */}
+      <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center mb-6 relative z-30">
+        <h1 className="text-3xl font-bold text-slate-900 flex items-center justify-center gap-2">
+          Discover <Sparkles className="h-6 w-6 text-cyan-600 animate-pulse" />
         </h1>
-        <p className="text-muted-foreground mt-1">Finding your perfect college connection</p>
+        <p className="text-slate-500 mt-1 text-sm">
+          {userTier === "free" ? `Free Tier (${5 - swipesCount} swipes remaining today)` : `${userTier.toUpperCase().replace("_", " ")} Active • Unlimited Swiping`}
+        </p>
       </motion.div>
+
+      {/* 🌟 ALUMNI DIRECT VIP ADVANCED FILTERS BAR */}
+      {userTier === "alumni_direct" && (
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }} 
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 z-30 flex flex-wrap items-center justify-center gap-3 bg-white/80 border border-purple-200 p-2.5 rounded-2xl shadow-sm backdrop-blur-md"
+        >
+          <div className="flex items-center gap-1.5 text-purple-700 text-xs font-bold px-2">
+            <Crown className="h-4 w-4" /> Advanced Alumni Filters:
+          </div>
+          <div className="flex items-center gap-1.5">
+            {["all", "alumni", "student"].map(r => (
+              <button
+                key={r}
+                onClick={() => { setRoleFilter(r as any); setCurrentIndex(0); }}
+                className={`text-xs px-3 py-1.5 rounded-xl font-bold capitalize transition-all ${roleFilter === r ? "bg-purple-600 text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          <div className="h-4 w-[1px] bg-slate-200" />
+          <div className="flex items-center gap-1.5">
+            {["all", "Computer Science", "Electrical"].map(d => (
+              <button
+                key={d}
+                onClick={() => { setDepartmentFilter(d); setCurrentIndex(0); }}
+                className={`text-xs px-3 py-1.5 rounded-xl font-bold transition-all ${departmentFilter === d ? "bg-slate-900 text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+              >
+                {d === "all" ? "All Depts" : d}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       <div className="relative w-full max-w-[400px] aspect-[3/4.5] perspective-1000 z-10">
         
-        {/* ❤️ Heart Burst Overlay */}
+        {/* Heart Burst Overlay */}
         <AnimatePresence>
           {showHeartBurst && (
             <motion.div
@@ -295,9 +327,7 @@ export default function Discovery() {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
             >
-              <Heart className="h-48 w-48 fill-cyan text-cyan drop-shadow-[0_0_50px_rgba(0,245,255,0.8)]" />
-              
-              {/* Particle sparks */}
+              <Heart className="h-48 w-48 fill-cyan-500 text-cyan-500 drop-shadow-[0_0_50px_rgba(0,245,255,0.8)]" />
               {[...Array(6)].map((_, i) => (
                 <motion.div
                   key={i}
@@ -309,77 +339,99 @@ export default function Discovery() {
                     y: (Math.random() - 0.5) * 300 
                   }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="absolute h-3 w-3 rounded-full bg-cyan shadow-[0_0_10px_cyan]"
+                  className="absolute h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_10px_cyan]"
                 />
               ))}
             </motion.div>
           )}
         </AnimatePresence>
 
-        {usersLeft > 0 ? (
+        {/* FREE TIER DAILY LIMIT PAYWALL OVERLAY */}
+        {isFreeLimitReached ? (
+          <div className="flex flex-col items-center justify-center h-full glass-card rounded-[2.5rem] text-center p-8 bg-white/90 border border-amber-200 shadow-xl">
+            <div className="h-20 w-20 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 mb-4 shadow-inner">
+              <Crown className="h-10 w-10 animate-bounce" />
+            </div>
+            <h2 className="text-2xl font-black text-slate-900 mb-2">Daily Swipes Reached!</h2>
+            <p className="text-slate-500 text-sm mb-6">
+              You've used your 5 free discovery swipes for today. Upgrade to UniLink Pro for unlimited swipes & requests unblur!
+            </p>
+            <Button 
+              onClick={() => navigate('/premium')}
+              className="w-full h-13 rounded-2xl bg-cyan-purple text-white font-bold shadow-md hover:scale-[1.02] text-base"
+            >
+              Upgrade to Pro (₹799)
+            </Button>
+          </div>
+        ) : usersLeft > 0 ? (
           <AnimatePresence>
-            {/* We render the current card AND the next card behind it */}
-            {initialUsers[currentIndex + 1] && (
+            {filteredCards[currentIndex + 1] && (
               <DiscoveryCard 
-                key={initialUsers[currentIndex + 1].id} 
-                user={initialUsers[currentIndex + 1]} 
+                key={filteredCards[currentIndex + 1]._id} 
+                user={filteredCards[currentIndex + 1]} 
                 isTop={false} 
+                userTier={userTier}
               />
             )}
-            {initialUsers[currentIndex] && (
+            {filteredCards[currentIndex] && (
               <DiscoveryCard 
-                key={initialUsers[currentIndex].id} 
-                user={initialUsers[currentIndex]} 
+                key={filteredCards[currentIndex]._id} 
+                user={filteredCards[currentIndex]} 
                 isTop={true} 
-                onSwipe={handleSwipe}
+                onSwipe={handleSwipeAction}
+                userTier={userTier}
+                onDirectMessage={handleDirectMessage}
               />
             )}
           </AnimatePresence>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full glass-card rounded-[2.5rem] text-center p-8">
+          <div className="flex flex-col items-center justify-center h-full glass-card rounded-[2.5rem] text-center p-8 bg-white/80 border border-black/[0.05]">
             <div className="h-24 w-24 rounded-full bg-gradient-to-tr from-cyan via-purple to-pink p-1 animate-spin-slow mb-6">
-              <div className="h-full w-full rounded-full bg-premium-900 flex items-center justify-center">
-                <Sparkles className="h-10 w-10 text-white" />
+              <div className="h-full w-full rounded-full bg-slate-50 flex items-center justify-center">
+                <Sparkles className="h-10 w-10 text-slate-800" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">That's everyone!</h2>
-            <p className="text-muted-foreground mb-6">Check back soon for more campus connections.</p>
-            <Button onClick={() => setCurrentIndex(0)} className="rounded-xl bg-cyan-purple px-8">Refresh Discovery</Button>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">That's everyone!</h2>
+            <p className="text-slate-500 mb-6">Check back soon for more campus connections.</p>
+            <Button onClick={fetchCards} variant="outline" className="rounded-xl border-slate-200 text-slate-700 bg-white">
+              Refresh Discovery
+            </Button>
           </div>
         )}
       </div>
 
-      {/* 🚀 Actions Bar */}
-      {usersLeft > 0 && (
+      {/* Actions Bar */}
+      {usersLeft > 0 && !isFreeLimitReached && (
         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="flex items-center gap-6 mt-12 relative z-30">
           <motion.button
             whileHover={{ scale: 1.1, rotate: -5 }} whileTap={{ scale: 0.9 }}
-            onClick={handleSwipe}
-            className="h-20 w-20 rounded-full glass-dark border border-pink/30 flex items-center justify-center text-pink shadow-pink transition-all bg-premium-800"
+            onClick={() => handleSwipeAction('pass')}
+            className="h-20 w-20 rounded-full border border-pink-200 flex items-center justify-center text-pink-600 shadow-md bg-white hover:bg-slate-50 transition-all"
           >
             <X className="h-10 w-10" />
           </motion.button>
 
           <motion.button
             whileHover={{ scale: 1.2, y: -5 }} whileTap={{ scale: 0.9 }}
-            className="h-16 w-16 rounded-full glass-dark border border-purple/30 flex items-center justify-center text-purple shadow-purple transition-all bg-premium-800"
+            onClick={() => handleSwipeAction('like')}
+            className="h-16 w-16 rounded-full border border-purple-200 flex items-center justify-center text-purple-650 shadow-md bg-white hover:bg-slate-50 transition-all"
           >
             <Zap className="h-8 w-8" />
           </motion.button>
           
           <motion.button
             whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}
-            onClick={handleLike}
-            className="h-20 w-20 rounded-full glass-dark border border-cyan/30 flex items-center justify-center text-cyan shadow-cyan transition-all bg-premium-800"
+            onClick={() => handleSwipeAction('like')}
+            className="h-20 w-20 rounded-full border border-cyan-200 flex items-center justify-center text-cyan-600 shadow-md bg-white hover:bg-slate-50 transition-all"
           >
-            <Heart className="h-10 w-10 fill-cyan" />
+            <Heart className="h-10 w-10 fill-cyan-650" />
           </motion.button>
         </motion.div>
       )}
 
-      {/* 🔢 User Count */}
-      <p className="mt-8 text-sm text-muted-foreground font-medium relative z-30">
-        Discovering connections around <span className="text-white">New York</span>
+      {/* User Count */}
+      <p className="mt-8 text-sm text-slate-500 font-medium relative z-30">
+        Discovering connections in your area
       </p>
 
     </PageTransition>

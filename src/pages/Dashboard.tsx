@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, MessageCircle, Bookmark, ThumbsUp, TrendingUp, Users, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const stats = [
   { label: "Connections", value: "128", icon: Users, color: "cyan" },
@@ -65,6 +66,8 @@ const itemVariants = {
 import { PageTransition } from "@/components/PageTransition";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
   return (
     <PageTransition className="container max-w-7xl mx-auto px-4 py-8">
       <motion.div
@@ -76,21 +79,21 @@ const Dashboard = () => {
         {/* ✨ Hero Section */}
         <motion.div 
           variants={itemVariants}
-          className="relative overflow-hidden rounded-[2rem] glass-dark border border-white/5 p-8 md:p-12"
+          className="relative overflow-hidden rounded-[2rem] glass border border-black/[0.05] p-8 md:p-12 bg-white/70 shadow-sm"
         >
-          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 h-64 w-64 rounded-full bg-cyan/10 blur-[80px]" />
+          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 h-64 w-64 rounded-full bg-cyan-200/20 blur-[80px]" />
           <div className="relative z-10">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4">
               Welcome back, <span className="text-gradient-cyan-purple">Explorer!</span> 👋
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl">
-              Your network is growing. You have <span className="text-cyan font-semibold">12 new connection requests</span> and 3 potential matches waiting for you.
+            <p className="text-lg text-slate-500 max-w-2xl font-medium">
+              Your network is growing. You have <span className="text-cyan-600 font-semibold">12 new connection requests</span> and 3 potential matches waiting for you.
             </p>
             <div className="flex flex-wrap gap-4 mt-8">
-              <Button className="rounded-2xl h-12 px-8 bg-cyan text-premium-900 font-bold hover:shadow-cyan transition-all">
+              <Button onClick={() => navigate('/discover')} className="rounded-2xl h-12 px-8 bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all">
                 Explore Matches
               </Button>
-              <Button variant="outline" className="rounded-2xl h-12 px-8 border-white/10 hover:bg-white/5 text-white">
+              <Button onClick={() => navigate('/connections')} variant="outline" className="rounded-2xl h-12 px-8 border-slate-200 hover:bg-slate-50 text-slate-700 bg-white">
                 View Requests
               </Button>
             </div>
@@ -104,14 +107,14 @@ const Dashboard = () => {
               key={i}
               variants={itemVariants}
               whileHover={{ y: -5, scale: 1.02 }}
-              className="glass-card rounded-3xl p-6 flex items-center gap-6"
+              className="glass-card rounded-3xl p-6 flex items-center gap-6 bg-white/70 border-black/[0.05]"
             >
-              <div className={`h-14 w-14 rounded-2xl flex items-center justify-center bg-${stat.color}/10 border border-${stat.color}/20 text-${stat.color} shadow-${stat.color}`}>
+              <div className={`h-14 w-14 rounded-2xl flex items-center justify-center bg-cyan-50 border border-cyan-100 text-cyan-600`}>
                 <stat.icon className="h-7 w-7" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground font-medium">{stat.label}</p>
-                <h3 className="text-2xl font-bold text-white mt-1">{stat.value}</h3>
+                <p className="text-sm text-slate-400 font-bold">{stat.label}</p>
+                <h3 className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</h3>
               </div>
             </motion.div>
           ))}
@@ -121,44 +124,44 @@ const Dashboard = () => {
           {/* 📡 Feed */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between px-2">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                <TrendingUp className="h-6 w-6 text-cyan" />
+              <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                <TrendingUp className="h-6 w-6 text-cyan-600" />
                 Trending Insight
               </h2>
-              <Button variant="ghost" className="text-cyan hover:bg-cyan/10">See All</Button>
+              <Button variant="ghost" className="text-cyan-600 hover:bg-cyan-50 font-semibold">See All</Button>
             </div>
             
             {feedPosts.map((post, i) => (
               <motion.div key={i} variants={itemVariants}>
-                <Card className="glass-card border-none rounded-[2rem] overflow-hidden hover:bg-white/[0.04] transition-all group">
+                <Card className="glass-card border border-black/[0.05] rounded-[2rem] overflow-hidden hover:bg-white transition-all bg-white/80 group">
                   <CardContent className="p-8">
                     <div className="flex items-center gap-4 mb-6">
-                      <div className={`h-12 w-12 rounded-2xl bg-${post.color}/20 border border-${post.color}/30 flex items-center justify-center font-bold text-${post.color} text-lg shadow-${post.color}`}>
+                      <div className={`h-12 w-12 rounded-2xl bg-cyan-50 border border-cyan-100 flex items-center justify-center font-bold text-cyan-600 text-lg`}>
                         {post.avatar}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-white text-lg">{post.author}</span>
-                          <Badge className={`bg-${post.color}/10 text-${post.color} border-${post.color}/20`}>
+                          <span className="font-bold text-slate-900 text-lg">{post.author}</span>
+                          <Badge className={`bg-cyan-50 text-cyan-700 border-cyan-100`}>
                             {post.badge}
                           </Badge>
                         </div>
-                        <span className="text-sm text-muted-foreground">{post.time}</span>
+                        <span className="text-sm text-slate-400">{post.time}</span>
                       </div>
                     </div>
-                    <p className="text-lg text-foreground/90 leading-relaxed mb-6 italic">
+                    <p className="text-lg text-slate-700 leading-relaxed mb-6 italic">
                       "{post.content}"
                     </p>
-                    <div className="flex items-center justify-between pt-6 border-t border-white/5">
-                      <div className="flex items-center gap-6 text-muted-foreground">
-                        <button className="flex items-center gap-2 hover:text-pink transition-colors group/btn">
+                    <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                      <div className="flex items-center gap-6 text-slate-500">
+                        <button className="flex items-center gap-2 hover:text-pink-600 transition-colors group/btn">
                           <ThumbsUp className="h-5 w-5 group-hover/btn:scale-110 transition-transform" /> {post.likes}
                         </button>
-                        <button className="flex items-center gap-2 hover:text-cyan transition-colors group/btn">
+                        <button className="flex items-center gap-2 hover:text-cyan-600 transition-colors group/btn">
                           <MessageCircle className="h-5 w-5 group-hover/btn:scale-110 transition-transform" /> {post.comments}
                         </button>
                       </div>
-                      <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-white rounded-xl">
+                      <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-700 rounded-xl">
                         <Bookmark className="h-5 w-5" />
                       </Button>
                     </div>
@@ -170,7 +173,7 @@ const Dashboard = () => {
 
           {/* 👥 Suggestions */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white px-2">People to Connect</h2>
+            <h2 className="text-2xl font-bold text-slate-900 px-2">People to Connect</h2>
             <div className="space-y-4">
               {suggestedUsers.map((user, i) => (
                 <motion.div
@@ -178,25 +181,25 @@ const Dashboard = () => {
                   variants={itemVariants}
                   whileHover={{ scale: 1.02 }}
                 >
-                  <Card className="glass-card border-none rounded-2xl p-4 hover:bg-white/[0.05] transition-all cursor-pointer">
+                  <Card className="glass-card border border-black/[0.05] rounded-2xl p-4 hover:bg-white transition-all cursor-pointer bg-white/80">
                     <div className="flex items-center gap-4">
-                      <div className={`h-12 w-12 shrink-0 rounded-xl bg-${user.color}/20 border border-${user.color}/30 flex items-center justify-center font-bold text-${user.color}`}>
+                      <div className={`h-12 w-12 shrink-0 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center font-bold text-slate-750`}>
                         {user.avatar}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-bold text-white truncate">{user.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="font-bold text-slate-900 truncate">{user.name}</p>
+                        <p className="text-xs text-slate-500 truncate">
                           {user.dept} · {user.company || user.year}
                         </p>
                       </div>
-                      <Button size="icon" className={`h-10 w-10 shrink-0 rounded-xl bg-${user.color}/10 text-${user.color} hover:bg-${user.color} hover:text-white transition-all`}>
+                      <Button size="icon" className={`h-10 w-10 shrink-0 rounded-xl bg-cyan-50 text-cyan-600 border border-cyan-100 hover:bg-cyan-500 hover:text-white transition-all`}>
                         <UserPlus className="h-5 w-5" />
                       </Button>
                     </div>
                   </Card>
                 </motion.div>
               ))}
-              <Button variant="outline" className="w-full rounded-2xl border-white/5 text-muted-foreground hover:text-white hover:bg-white/5 py-6">
+              <Button onClick={() => navigate('/discover')} variant="outline" className="w-full rounded-2xl border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 py-6 bg-white shadow-sm">
                 Discover More People
               </Button>
             </div>

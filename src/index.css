@@ -65,13 +65,13 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+    @apply bg-white/70 backdrop-blur-xl border border-black/[0.05];
   }
   .glass-dark {
-    @apply bg-black/40 backdrop-blur-2xl border border-white/5;
+    @apply bg-white/80 backdrop-blur-2xl border border-black/[0.04];
   }
   .glass-card {
-    @apply bg-white/[0.03] backdrop-blur-md border border-white/5 shadow-glass;
+    @apply bg-white/60 backdrop-blur-md border border-black/[0.04] shadow-glass-light;
   }
   .bg-cyan-purple {
     @apply bg-gradient-to-tr from-cyan-400 via-purple-500 to-cyan-500;
@@ -92,7 +92,10 @@
     @apply bg-clip-text text-transparent bg-gradient-to-tr from-cyan-400 via-purple-500 to-pink-500;
   }
   .shadow-glass {
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+  }
+  .shadow-glass-light {
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
   }
   .shadow-cyan {
     box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);

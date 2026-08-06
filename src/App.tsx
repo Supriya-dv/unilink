@@ -17,9 +17,12 @@ import Connections from "./pages/Connections";
 import Messages from "./pages/Messages";
 import StartMatch from "./pages/StartMatch";
 import CareerJourneys from "./pages/CareerJourneys";
+import Settings from "./pages/Settings";
+import Premium from "./pages/Premium";
 import NotFound from "./pages/NotFound";
 
 import { AppLayout } from "./components/AppLayout";
+import { AuthProvider, ProtectedRoute } from "./hooks/use-auth";
 
 const queryClient = new QueryClient();
 
@@ -33,18 +36,21 @@ const AnimatedRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/pricing" element={<Premium />} />
 
-        {/* ⭐ Start Match Page (Full Screen) */}
-        <Route path="/start-match" element={<StartMatch />} />
+        {/* ⭐ Start Match Page (Full Screen, Protected) */}
+        <Route path="/start-match" element={<ProtectedRoute><StartMatch /></ProtectedRoute>} />
 
-        {/* App Layout Routes */}
-        <Route element={<AppLayout />}>
+        {/* App Layout Routes (Protected) */}
+        <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/discover" element={<Discovery />} />
           <Route path="/connections" element={<Connections />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/careers" element={<CareerJourneys />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/premium" element={<Premium />} />
         </Route>
 
         {/* 404 */}
@@ -62,7 +68,9 @@ function App() {
         <Sonner />
 
         <BrowserRouter>
-          <AnimatedRoutes />
+          <AuthProvider>
+            <AnimatedRoutes />
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

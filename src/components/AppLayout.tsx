@@ -29,18 +29,18 @@ export const AppLayout = () => {
   }, [mouseX, mouseY]);
 
   return (
-    <div className="relative flex min-h-screen bg-premium-900 text-foreground overflow-hidden selection:bg-cyan/30 selection:text-cyan">
+    <div className="relative flex min-h-screen bg-slate-50 text-slate-800 overflow-hidden selection:bg-cyan-100 selection:text-cyan-800">
       
       {/* 🔴 Cursor Glow Effect */}
       <motion.div
         className="pointer-events-none fixed inset-0 z-30 opacity-40 transition-opacity duration-300"
         style={{
-          background: `radial-gradient(600px circle at ${cursorX}px ${cursorY}px, rgba(0, 245, 255, 0.1), transparent 80%)`,
+          background: `radial-gradient(600px circle at ${cursorX}px ${cursorY}px, rgba(34, 211, 238, 0.15), transparent 80%)`,
         }}
       />
 
       {/* 🔮 Background Animated Blobs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[#050505]">
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-slate-50">
         <motion.div
            style={{ x: bgX1, y: bgY1 }}
            className="absolute inset-0 z-0 h-full w-full"
@@ -48,7 +48,7 @@ export const AppLayout = () => {
           <motion.div
             animate={{ x: [0, 100, 0], y: [0, 50, 0], scale: [1, 1.2, 1] }}
             transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -top-[10%] -left-[10%] h-[50%] w-[50%] rounded-full bg-cyan/10 blur-[120px]"
+            className="absolute -top-[10%] -left-[10%] h-[50%] w-[50%] rounded-full bg-cyan-200/40 blur-[120px]"
           />
         </motion.div>
         
@@ -59,7 +59,7 @@ export const AppLayout = () => {
           <motion.div
             animate={{ x: [0, -100, 0], y: [0, 80, 0], scale: [1, 1.1, 1] }}
             transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-[20%] -right-[10%] h-[40%] w-[40%] rounded-full bg-purple/10 blur-[120px]"
+            className="absolute top-[20%] -right-[10%] h-[40%] w-[40%] rounded-full bg-purple-200/40 blur-[120px]"
           />
         </motion.div>
         <motion.div
@@ -73,7 +73,7 @@ export const AppLayout = () => {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -bottom-[10%] left-[20%] h-[45%] w-[45%] rounded-full bg-pink/10 blur-[120px]"
+          className="absolute -bottom-[10%] left-[20%] h-[45%] w-[45%] rounded-full bg-pink-200/40 blur-[120px]"
         />
       </div>
 
