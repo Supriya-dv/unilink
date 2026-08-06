@@ -4,10 +4,18 @@ const TOKEN_KEY = 'unilink_token';
 
 let socket: Socket | null = null;
 
+interface ImportMetaEnv {
+  readonly VITE_SERVER_URL?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 export const connectSocket = () => {
   if (socket && socket.connected) return socket;
   const token = localStorage.getItem(TOKEN_KEY);
-  const url = String(import.meta.env.VITE_SERVER_URL || (typeof window !== 'undefined' ? window.location.origin : ''));
+  const url = String((import.meta as ImportMeta).env.VITE_SERVER_URL || (typeof window !== 'undefined' ? window.location.origin : ''));
   socket = io(url, {
     auth: { token },
     autoConnect: true,

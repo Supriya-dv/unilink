@@ -166,9 +166,7 @@ export default function Messages() {
     return () => {
       // cleanup listeners
       try {
-        if (socketClient) {
-          disconnectSocket();
-        }
+        disconnectSocket();
       } catch (err) {
         // noop
       }
